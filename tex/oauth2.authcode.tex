@@ -1,0 +1,73 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+\begin{document}
+
+	\sffamily
+	\small
+
+    \begin{sequencediagram}
+    \tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+
+	\def\unitfactor{1.2}
+\newinst[0]{U}{Resource Owner}
+\newinst[6]{UA}{User Agent}
+\newinst[6]{C}{Client}
+\newinst[6]{AS}{Auth Server}
+\newinst[6]{S}{Resource Server}
+	\mess[0]{U}{Initiate OAuth 2.0 flow}{UA}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{UA}{GET /setup-app-with-privilege}{C}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{C}{\shortstack{302 AuthServer: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{UA}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{UA}{\shortstack{POST /auth: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{AS}{prompt to login}{U}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{U}{signing in}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{AS}{asking for consent}{U}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{U}{yes!}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{AS}{\shortstack{302 CLIENTURL: \\AUTHCODE, CLIENTSTATE}}{UA}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{UA}{\shortstack{POST /cb: \\AUTHCODE, CLIENTSTATE}}{C}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{C}{\shortstack{POST /token \\AUTHCODE, CLIENTURL, CLIENTID}}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{AS}{\shortstack{200 OK: \\ACCESSTOKEN}}{C}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{C}{done}{UA}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{UA}{done}{U}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{C}{\shortstack{GET /resource \\ACCESSTOKEN}}{S}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{S}{here is the resources...}{C}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+
+    \end{sequencediagram}
+\end{document}

@@ -1,0 +1,28 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+\begin{document}
+
+	\sffamily
+	\small
+
+    \begin{sequencediagram}
+    \tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+
+	\def\unitfactor{1.2}
+\newinst[0]{A}{Alice}
+\newinst[6]{B}{Bob}
+	\mess[0]{A}{$g$, $p$, A}{B}
+	\node [anchor=east] at (mess from) {$A = g^a$ mod $p$};
+	\node [anchor=west] at (mess to) {$B = g^b$ mod $p$};
+	\mess[0]{B}{$B$}{A}
+	\node [anchor=west] at (mess from) {$K = A^b$ mod $p$};
+	\node [anchor=east] at (mess to) {$K = B^a$ mod $p$};
+
+    \end{sequencediagram}
+\end{document}

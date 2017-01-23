@@ -1,0 +1,16 @@
+title: DH
+actor:
+-  A: Alice
+-  B: Bob
+sequence:
+- A:
+    B:
+      label: "$g$, $p$, A"
+      textFrom: "$A = g^a$ mod $p$"
+      textTo: "$B = g^b$ mod $p$"
+
+- B:
+    A:
+      label: "$B$"
+      textFrom: "$K = A^b$ mod $p$"
+      textTo: "$K = B^a$ mod $p$"

@@ -1,0 +1,26 @@
+title: OAuth 2.0 Auth Code mode
+
+actor:
+- U: Resource Owner
+- UA: User Agent
+- C: Client
+- AS: Auth Server
+- S: Resource Server
+
+sequence:
+- U: {UA: "Initiate OAuth 2.0 flow"}
+- UA: {C: "GET /setup-app-with-privilege"}
+- C: {UA: "302 AuthServer: \nCLIENTID, CLIENTURL, SCOPE, CLIENTSTATE"}
+- UA: {AS: "POST /auth: \nCLIENTID, CLIENTURL, SCOPE, CLIENTSTATE"}
+- AS: {U: "prompt to login"}
+- U: {AS: "signing in"}
+- AS: {U: "asking for consent"}
+- U: {AS: "yes!"}
+- AS: {UA: "302 CLIENTURL: \nAUTHCODE, CLIENTSTATE" }
+- UA: {C: "POST /cb: \nAUTHCODE, CLIENTSTATE" }
+- C: {AS: "POST /token \nAUTHCODE, CLIENTURL, CLIENTID"}
+- AS: {C: "200 OK: \nACCESSTOKEN"}
+- C: {UA: "done"}
+- UA: {U: "done"}
+- C: {S: "GET /resource \nACCESSTOKEN"}
+- S: {C: "here is the resources..."}
