@@ -4,7 +4,7 @@ actor:
 - U: Resource Owner
 - UA: User Agent
 - C: Client
-- AS: Auth Server
+- AS: Authz Server
 - S: Resource Server
 
 sequence:
