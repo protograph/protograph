@@ -6,7 +6,7 @@ Protograph generations requires protographer and LaTex.
 
 Installing protographer:
 ```
-go get github.com/protograph/protographer/cmd/protographer
+go get -u github.com/protograph/protographer/cmd/protographer
 ```
 
 Generating protograph:
