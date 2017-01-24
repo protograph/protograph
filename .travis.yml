@@ -13,10 +13,11 @@ services:
 before_install:
 - openssl aes-256-cbc -K $encrypted_18e972c08e0f_key -iv $encrypted_18e972c08e0f_iv
   -in deploy.key.enc -out deploy.key -d
-- docker pull yukinying/latex
+- chmod 600 deploy.key
 
 install:
 - go get -u github.com/protograph/protographer/cmd/protographer
+- docker pull yukinying/latex
 
 script:
 - protographer -in yaml -out tex
@@ -27,4 +28,5 @@ after_success:
 - echo "SUCCESS!"
 - git add tex/*.tex tex/*.pdf
 - git commit -m 'generated TeX and PDF from Travis [skip ci]'
-- GIT_SSH_COMMAND='ssh -i deploy.key' git push origin HEAD:master
+- git remote add deploy git@github.com:protograph/protograph.git
+- GIT_SSH_COMMAND='ssh -i deploy.key' git push deploy HEAD:master
