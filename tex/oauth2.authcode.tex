@@ -6,6 +6,37 @@
 \usetikzlibrary{shadows,positioning}
 \tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
 
+%% Redefine mess and messanother to avoid the macro create node with non-trival label
+\newcommand*{\messanother}[4][0]{
+   \stepcounter{seqlevel}
+   \path
+   (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+   \addtocounter{seqlevel}{#1}
+   \path
+   (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+   \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]
+   {#3};
+	 %% comment out the problematic node creation here.
+   % \node (#3 from) at (mess from) {};
+   % \node (#3 to) at (mess to) {};
+}
+
+\renewcommand{\mess}[4][0]{
+    \ifthenelse{\equal{#2}{#4}}
+    {
+        \ifthenelse{\equal{#1}{0}}
+        {
+          \messself[1]{#2}{#3}
+        }
+        {
+        \messself[#1]{#2}{#3}
+        }
+    }
+    {
+      \messanother[#1]{#2}{#3}{#4}
+    }
+}
+
 \begin{document}
 
 	\sffamily
