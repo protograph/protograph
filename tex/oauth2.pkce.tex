@@ -1,0 +1,86 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess and messanother to avoid the macro create node with non-trival label
+\newcommand*{\messanother}[4][0]{
+   \stepcounter{seqlevel}
+   \path
+   (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+   \addtocounter{seqlevel}{#1}
+   \path
+   (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+   \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]
+   {#3};
+	 %% comment out the problematic node creation here.
+   % \node (#3 from) at (mess from) {};
+   % \node (#3 to) at (mess to) {};
+}
+
+\renewcommand{\mess}[4][0]{
+    \ifthenelse{\equal{#2}{#4}}
+    {
+        \ifthenelse{\equal{#1}{0}}
+        {
+          \messself[1]{#2}{#3}
+        }
+        {
+        \messself[#1]{#2}{#3}
+        }
+    }
+    {
+      \messanother[#1]{#2}{#3}{#4}
+    }
+}
+
+\begin{document}
+
+	\sffamily
+	\small
+
+    \begin{sequencediagram}
+    \tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+
+	\def\unitfactor{1.2}
+\newinst[0]{U}{Resource Owner}
+\newinst[6]{UA}{User Agent}
+\newinst[6]{C}{Client}
+\newinst[6]{AS}{Authz Server}
+\newinst[6]{S}{Resource Server}
+	\mess[0]{C}{\shortstack{302 AuthServer: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE,\\ CHALLENGE}}{UA}
+	\node [anchor=west] at (mess from) {\shortstack{VERIFIER = SECURE_RNG() \\ CHALLENGE = SHA256(VERIFIER)}};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{UA}{\shortstack{POST /auth \\ CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE, CHALLENGE}}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{AS}{prompt to login}{U}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{U}{signing in}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{AS}{asking for consent}{U}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{U}{yes!}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{AS}{\shortstack{302 CLIENTURL: \\AUTHCODE, CLIENTSTATE}}{UA}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+	\mess[0]{UA}{\shortstack{POST /cb \\ AUTHCODE, CLIENTSTATE}}{C}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {};
+	\mess[0]{C}{AUTHCODE, VERIFIER}{AS}
+	\node [anchor=east] at (mess from) {};
+	\node [anchor=west] at (mess to) {CHALLENGE $\stackrel{?}{=}$ SHA256(VERIFIER)};
+	\mess[0]{AS}{\shortstack{200 OK: \\ACCESSTOKEN}}{C}
+	\node [anchor=west] at (mess from) {};
+	\node [anchor=east] at (mess to) {};
+
+    \end{sequencediagram}
+\end{document}
