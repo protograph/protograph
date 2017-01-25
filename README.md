@@ -1,5 +1,7 @@
 # Protograph
 
+[![Build Status](https://travis-ci.org/protograph/protograph.svg?branch=master)](https://travis-ci.org/protograph/protograph)
+
 Protograph is a collection of sequence diagrams of various protocols.
 
 Protograph generations requires protographer and LaTex.
