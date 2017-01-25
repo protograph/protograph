@@ -11,9 +11,8 @@ sequence:
 
 - C:
     UA:
-      label: "302 AuthServer: \nCLIENTID, CLIENTURL, SCOPE, CLIENTSTATE,\n CHALLENGE"
-      textFrom: "VERIFIER = SECURE_RNG() \n CHALLENGE = SHA256(VERIFIER)"
-      textTo: ""
+      arrow: "302 AuthServer: \nCLIENTID, CLIENTURL, SCOPE, CLIENTSTATE,\n CHALLENGE"
+      from: "VERIFIER = SECURE_RNG() \n CHALLENGE = SHA256(VERIFIER)"
 - UA: {AS: "POST /auth \n CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE, CHALLENGE"}
 - AS: {U: "prompt to login"}
 - U: {AS: "signing in"}
@@ -23,7 +22,6 @@ sequence:
 - UA: {C: "POST /cb \n AUTHCODE, CLIENTSTATE"}
 - C:
     AS:
-      label: AUTHCODE, VERIFIER
-      textTo: 'CHALLENGE $\stackrel{?}{=}$ SHA256(VERIFIER)'
-      textFrom: ""
+      arrow: AUTHCODE, VERIFIER
+      to: 'CHALLENGE $\stackrel{?}{=}$ SHA256(VERIFIER)'
 - AS: {C: "200 OK: \nACCESSTOKEN"}
