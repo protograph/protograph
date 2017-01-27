@@ -48,10 +48,10 @@
 	\def\unitfactor{1.2}
 \newinst[0]{A}{Alice}
 \newinst[6]{B}{Bob}
-	\mess[0]{A}{$g$, $p$, $A$}{B}
+	\mess[1]{A}{$g$, $p$, $A$}{B}
 	\node [anchor=east] at (mess from) {$A = g^a$ mod $p$};
 	\node [anchor=west] at (mess to) {$B = g^b$ mod $p$};
-	\mess[0]{B}{$B$}{A}
+	\mess[1]{B}{$B$}{A}
 	\node [anchor=west] at (mess from) {$K = A^b$ mod $p$};
 	\node [anchor=east] at (mess to) {$K = B^a$ mod $p$};
 
