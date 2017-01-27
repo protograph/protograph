@@ -8,5 +8,6 @@ sequence:
       arrow: "$g$, $p$, $A$"
       from: "$A = g^a$ mod $p$"
       to: "$B = g^b$ mod $p$"
+      time: 1
 
-- B: { A: { arrow: "$B$", from: "$K = A^b$ mod $p$", to: "$K = B^a$ mod $p$"}}
+- B: { A: { arrow: "$B$", from: "$K = A^b$ mod $p$", to: "$K = B^a$ mod $p$", time: 1}}
