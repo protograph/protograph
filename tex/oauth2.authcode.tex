@@ -57,10 +57,10 @@
 	\mess[0]{UA}{GET /setup-app-with-privilege}{C}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
-	\mess[0]{C}{\shortstack{302 AuthServer: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{UA}
+	\mess[0]{C}{\shortstack[l]{302 AuthServer: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{UA}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
-	\mess[0]{UA}{\shortstack{POST /auth: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{AS}
+	\mess[0]{UA}{\shortstack[l]{POST /auth: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{AS}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
 	\mess[0]{AS}{prompt to login}{U}
@@ -75,16 +75,16 @@
 	\mess[0]{U}{yes!}{AS}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
-	\mess[0]{AS}{\shortstack{302 CLIENTURL: \\AUTHCODE, CLIENTSTATE}}{UA}
+	\mess[0]{AS}{\shortstack[l]{302 CLIENTURL: \\AUTHCODE, CLIENTSTATE}}{UA}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
-	\mess[0]{UA}{\shortstack{POST /cb: \\AUTHCODE, CLIENTSTATE}}{C}
+	\mess[0]{UA}{\shortstack[l]{POST /cb: \\AUTHCODE, CLIENTSTATE}}{C}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
-	\mess[0]{C}{\shortstack{POST /token \\AUTHCODE, CLIENTURL, CLIENTID}}{AS}
+	\mess[0]{C}{\shortstack[l]{POST /token \\AUTHCODE, CLIENTURL, CLIENTID}}{AS}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
-	\mess[0]{AS}{\shortstack{200 OK: \\ACCESSTOKEN}}{C}
+	\mess[0]{AS}{\shortstack[l]{200 OK: \\ACCESSTOKEN}}{C}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
 	\mess[0]{C}{done}{UA}
@@ -93,7 +93,7 @@
 	\mess[0]{UA}{done}{U}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
-	\mess[0]{C}{\shortstack{GET /resource \\ACCESSTOKEN}}{S}
+	\mess[0]{C}{\shortstack[l]{GET /resource \\ACCESSTOKEN}}{S}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
 	\mess[0]{S}{here is the resources...}{C}
