@@ -1,0 +1,29 @@
+title: U2F
+actor:
+-  D: Device
+-  B: Browser
+-  S: Server
+sequence:
+- B:
+    S:
+      arrow: "username and password"
+      to: "verify password and generate challenge"
+      time: 1
+- S:
+    B:
+      arrow: "challenge"
+      time: 1
+- B:
+    D:
+      arrow: "challenge"
+      to: "user touches button"
+      time: 1
+- D:
+    B:
+      arrow: "response"
+      time: 1
+- B:
+    S:
+      arrow: "response"
+      to: "verify response"
+      time: 1
