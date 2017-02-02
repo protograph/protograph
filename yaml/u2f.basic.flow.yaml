@@ -1,0 +1,24 @@
+title: U2F
+actor:
+-  D: Device
+-  B: Browser
+-  S: Server
+sequence:
+- B:
+    S:
+      arrow: "USERNAME and PASSWORD"
+      to: "Verify PASSWORD\nand generate CHALLENGE"
+- S:
+    B:
+      arrow: "$C$ = CHALLENGE"
+- B:
+    D:
+      arrow: "$C$"
+      to: "User touches button"
+- D:
+    B:
+      arrow: "$R$ = RESPONSE"
+- B:
+    S:
+      arrow: "$R$"
+      to: "Verify $R$"
