@@ -17,7 +17,7 @@ sequence:
       to: "Sign $C$ with $Kpriv$"
 - D:
     B:
-      arrow: "$S$ = Signature($C$)"
+      arrow: "$S$ = Signature($C$, $Kpriv$)"
 - B:
     S:
       arrow: "$S$"
