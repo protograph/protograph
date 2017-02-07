@@ -21,7 +21,7 @@ sequence:
 
   - I:
       S:
-        arrow: $Q_{`I`_a}, Q_{`S`_a}, Q_{`O`_a} $  # O_i_init..
+        arrow: $Q_{`I`_a}, Q_{`S`_a}, Q_{`O`_a}, `SIGN`(`I`_a, Q_{`S`_a})$  # O_i_init..
         from: |
           Identity Key: $`I`_a = (d_{`I`_a}, Q_{`I`_a})  <- `Curve25519`()$
           Signed Pre Key: $`S`_a = (d_{`S`_a}, Q_{`S`_a}) <- `Curve25519`()$
@@ -29,7 +29,7 @@ sequence:
 
   - R:
       S:
-        arrow: $Q_{`I`_b}, Q_{`S`_b}, Q_{`O`_b} $  # O_i_init..
+        arrow: $Q_{`I`_b}, Q_{`S`_b}, Q_{`O`_b}, `SIGN`(`I`_b, Q_{`S`_b})$  # O_i_init..
         from: |
           Identity Key: $`I`_b = (d_{`I`_b}, Q_{`I`_b})  <- `Curve25519`()$
           Signed Pre Key: $`S`_b = (d_{`S`_b}, Q_{`S`_b}) <- `Curve25519`()$
@@ -86,17 +86,19 @@ sequence:
   - I:
       R:
         arrow: |
-          cipher = AES256($K_`message`$, message), signature = HMAC-SHA256($K_`message`$, cipher), $Q_{`E`_a}$
+          cipher, HMAC($K_`message`$, cipher), $Q_{`E`_a}$
         from: |
           Ephemeral Key: $`E`_a = (d_{`E`_a}, Q_{`E`_a})<- `Curve25519`()$
-          $K_`message` = `HMAC-SHA256`(K_`chain`, 1) $
-          $K_`chain` = `HMAC-SHA256`(K_`chain`, 2) $
+          $K_`message` = `HMAC`(K_`chain`, 1) $
+          $K_`chain` = `HMAC`(K_`chain`, 2) $
+          $`cipher` = `ENCRYPT`(K_`message`, `message`)$
 
         to: |
           $K_`master` <- K_1 || K_2 || K_3 || K_4 $
           $K_`root`, K_`chain` = `HKDF`(K_`master`)$
-          $K_`message` = `HMAC-SHA256`(K_`chain`, 1) $
-          $K_`chain` = `HMAC-SHA256`(K_`chain`, 2) $
+          $K_`message` = `HMAC`(K_`chain`, 1) $
+          $K_`chain` = `HMAC`(K_`chain`, 2) $
+          $`message` = `DECRYPT`(K_`message`, `cipher`)$
 
   - EMPTYLINE:
 
