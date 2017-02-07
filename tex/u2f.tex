@@ -6,35 +6,16 @@
 \usetikzlibrary{shadows,positioning}
 \tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
 
-%% Redefine mess and messanother to avoid the macro create node with non-trival label
-\newcommand*{\messanother}[4][0]{
-   \stepcounter{seqlevel}
-   \path
-   (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
-   \addtocounter{seqlevel}{#1}
-   \path
-   (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
-   \draw[->,>=angle 60] (mess from) -- (mess to) node[midway, above]
-   {#3};
-	 %% comment out the problematic node creation here.
-   % \node (#3 from) at (mess from) {};
-   % \node (#3 to) at (mess to) {};
-}
-
-\renewcommand{\mess}[4][0]{
-    \ifthenelse{\equal{#2}{#4}}
-    {
-        \ifthenelse{\equal{#1}{0}}
-        {
-          \messself[1]{#2}{#3}
-        }
-        {
-        \messself[#1]{#2}{#3}
-        }
-    }
-    {
-      \messanother[#1]{#2}{#3}{#4}
-    }
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
 }
 
 \begin{document}
@@ -49,19 +30,19 @@
 \newinst[0]{D}{Device}
 \newinst[6]{B}{Browser}
 \newinst[6]{S}{Server}
-	\mess[1]{B}{username and password}{S}
+	\mess[1]{B}{username and password}{S}{black,->}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {verify password and generate challenge};
-	\mess[1]{S}{challenge}{B}
+	\mess[1]{S}{challenge}{B}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
-	\mess[1]{B}{challenge}{D}
+	\mess[1]{B}{challenge}{D}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {user touches button};
-	\mess[1]{D}{response}{B}
+	\mess[1]{D}{response}{B}{black,->}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
-	\mess[1]{B}{response}{S}
+	\mess[1]{B}{response}{S}{black,->}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {verify response};
 
