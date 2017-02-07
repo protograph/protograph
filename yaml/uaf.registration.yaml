@@ -1,0 +1,66 @@
+title: UAF Registration
+actor:
+- U: User
+- A: Authenticator
+- ASM: ASM
+- C: FIDO Client
+- B: User Agent
+- W: Web Server
+- S: FIDO Server
+sequence:
+- U: {B: "User clicks on https://webapp"}
+- B: {W: "HTTP GET https://webapp"}
+- W: {B: "HTTP 200 OK (login form returns)"}
+- B: {U: "Render the login form"}
+- U: {B: "User enters $u$ = USERNAME, $pwd$ = PASMSWORD\nand submits"}
+- B: {W: {arrow: "HTTP POST {$u$, $pwd$}", to: "Verify $u$, $pwd$"}}
+- W: 
+    S: 
+      arrow: "Start the UAF Registration"
+      to: "Generate Auth Policy ($p$)"
+- S:
+    W:
+      arrow: "Send UAF Registration Request = \n($a$ = APP_ID, $s$ = SESSION_ID, $c$ = CHALLENGE, $u$, $p$)"
+- W:
+    B:
+      arrow: "HTTP 200 OK ($a$, $s$, $u$, $c$, $p$)"
+- B:
+    C:
+      arrow: "$a$, $s$, $u$, $c$, $p$"
+- C:
+    ASM:
+      arrow: "$a$, $u$, $fc$ = hash($fcp$), ..."
+      from: "1. Select authenticator(s) according to $p$\n2. Obtain the FACET_ID and TLS_DATA\n3. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)"
+- EMPTYLINE:
+- ASM:
+    A:
+      arrow: "Send Register Command\n($a$, $u$, $fc$, ...)"
+- A:
+    U:
+      arrow: "Trigger local user verification"
+- U:
+    A:
+      arrow: "User interacts with Authenticator(s)"
+      to: "1. Generate Uauth Key Pair = ($Kpub$, $Kpriv$) for this handle $h$ = ($a$, $u$)\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Kpub$, $fc$, $sig$ = signature($AAID$, $Kpub$, $fc$, ...), ...)\nNOTE: $AAID$ = Authenticator Attestation ID"
+- A:
+    ASM:
+      arrow: "$KRD$"
+- ASM:
+    C:
+      arrow: "$KRD$"
+- C:
+    B:
+      arrow: "$KRD$"
+- B:
+    W:
+      arrow: "$KRD$"
+- W:
+    S:
+      arrow: "$KRD$"
+      to: "1. Verify the $KRD$ signature\n2. Store $Kpub$ for this $h$"
+- S:
+    W:
+      arrow: "Return verification result"
+- W:
+    B:
+      arrow: "HTTP 200 OK (verification result)"
