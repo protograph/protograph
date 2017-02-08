@@ -1,0 +1,31 @@
+title: Whatsapp Signal Protocol
+
+actor:
+  - I: >
+      sender: $a$
+  - S: server
+  - R: >
+      recipients
+
+sequence:
+
+  - I:
+      R:
+        arrow: sends $K_`sender`$ using the pairwise messaging protocol
+        from: |
+          $K_`chain` <- `Random`_`32bytes`()$
+          $`S`_a = (d_{`S`_a}, Q_{`S`_a}) <- `Curve25519`()$
+          $K_`sender` =  K_`chain` || Q_{`S`_a}$
+
+  - EMPTYLINE:
+
+  - I:
+      S:
+        arrow: cipher, signature
+        from: |
+          $K_`message` = `HMAC`_{K_`chain`}(1) $
+          $K_`chain` = `HMAC`_{K_`chain`}(2) $
+          $`cipher` = `Encrypt`_{K_`message`}(`message`)$
+          $`signature` = `Sign`_{d_{`S`_a}}(`cipher`)$
+
+  - S: {R: "cipher, signature"}
