@@ -41,7 +41,8 @@ sequence:
 - U:
     A:
       arrow: "User interacts with Authenticator(s)"
-      to: "1. Generate Uauth Key Pair = ($Kpub$, $Kpriv$) for this handle $h$ = ($a$, $u$)\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Kpub$, $fc$, $sig$ = signature($AAID$, $Kpub$, $fc$, ...), ...)\nNOTE: $AAID$ = Authenticator Attestation ID"
+      to: "1. Generate UAuth Key Pair = ($K.pub$, $K.priv$) for this handle $h$ = ($a$, $u$)\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $K.pub$, $fc$, $Att.cert$, $sig$ = signature_by_$Att.priv$($AAID$, $K.pub$, $fc$, $Att.pub$, ...), ...)\n\n$AAID$ = Authenticator Attestation ID\n$Att.cert$ = Authenticator Certificate\n$Att.pub$, $Att.priv$ = Authenticator Key Pair"
+- EMPTYLINE:
 - A:
     ASM:
       arrow: "$KRD$"
@@ -57,7 +58,7 @@ sequence:
 - W:
     S:
       arrow: "$KRD$"
-      to: "1. Verify the $KRD$ signature\n2. Store $Kpub$ for this $h$"
+      to: "1. Verify the $KRD$ signature by $Att.pub$\n2. Store $K.pub$ for this $h$"
 - S:
     W:
       arrow: "Return verification result"
