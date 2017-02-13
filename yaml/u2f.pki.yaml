@@ -1,0 +1,24 @@
+title: U2F
+actor:
+-  D: Device
+-  B: Browser
+-  S: Server
+sequence:
+- B:
+    S:
+      arrow: "USERNAME and PASSWORD"
+      to: "Verify PASSWORD\n lookup $Kpub$\nand generate CHALLENGE"
+- S:
+    B:
+      arrow: "$C$ = CHALLENGE"
+- B:
+    D:
+      arrow: "$C$"
+      to: "Sign $C$ with $Kpriv$"
+- D:
+    B:
+      arrow: "$S$ = Signature($C$, $Kpriv$)"
+- B:
+    S:
+      arrow: "$S$"
+      to: "Verify $S$ with $Kpub$"
