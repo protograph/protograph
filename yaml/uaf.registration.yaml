@@ -2,7 +2,7 @@ title: UAF Registration
 actor:
 - U: User
 - A: Authenticator
-- ASM: ASM
+- ASM: Authenticator Specific Modules
 - C: FIDO Client
 - B: User Agent
 - W: Web Server
@@ -29,19 +29,19 @@ sequence:
       arrow: "$a$, $s$, $u$, $c$, $p$"
 - C:
     ASM:
-      arrow: "$a$, $u$, $fc$ = hash($fcp$), ..."
-      from: "1. Select authenticator(s) according to $p$\n2. Obtain the FACET_ID and TLS_DATA\n3. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)"
+      arrow: "$a$, $u$, $ak$, $fc$ = hash($fcp$), ..."
+      from: "1. Select authenticator(s) according to $p$\n2. Obtain the FACET_ID and TLS_DATA\n3. Generate the access token $ak$ = hash($a$, NONCE, PERSONAL_ID, CALLER_ID)\n4. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)"
 - EMPTYLINE:
 - ASM:
     A:
-      arrow: "Send Register Command\n($a$, $u$, $fc$, ...)"
+      arrow: "Send Register Command\n($a$, $u$, $ak$, $fc$, ...)"
 - A:
     U:
       arrow: "Trigger local user verification"
 - U:
     A:
       arrow: "User interacts with Authenticator(s)"
-      to: "1. Generate UAuth Key Pair = ($K.pub$, $K.priv$) for this handle $h$ = ($a$, $u$)\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $K.pub$, $fc$, $Att.cert$, $sig$ = signature_by_$Att.priv$($AAID$, $K.pub$, $fc$, $Att.pub$, ...), ...)\n\n$AAID$ = Authenticator Attestation ID\n$Att.cert$ = Authenticator Certificate\n$Att.pub$, $Att.priv$ = Authenticator Key Pair"
+      to: "1. Generate UAuth Key Pair = ($K.pub$, $K.priv$) for this handle $h$ = ($a$, $u$) by $ak$\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $K.pub$, $fc$, $Att.cert$, $sig$ = signature_by_$Att.priv$($AAID$, $K.pub$, $fc$, $Att.pub$, ...), ...)\n\n$AAID$ = Authenticator Attestation ID\n$Att.cert$ = Authenticator Certificate\n$Att.pub$, $Att.priv$ = Authenticator Key Pair"
 - EMPTYLINE:
 - A:
     ASM:
