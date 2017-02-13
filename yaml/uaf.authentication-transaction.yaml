@@ -37,7 +37,7 @@ sequence:
 - U:
     A:
       arrow: "User Verified"
-      to: "1. Unlock UAuth Key Pair = ($K.pub$, $K.priv$) for this handle $h$ by $ak$\n2. Generate a nonce ($n$)\n3. Generate the Sign Data = $SignData$ = ($fc$, $n$, $cntr$, $t$, $sig$ = signature_by_$K.priv$($fc$, $n$, $cntr$, $t$))\n\n$cntr$ = Signature Counter."
+      to: "1. Unlock UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ by $ak$\n2. Generate a nonce ($n$)\n3. Generate the Sign Data = $SignData$ = ($fc$, $n$, $cntr$, $t$, $sig$ = signature_by_$Auth.priv$($fc$, $n$, $cntr$, $t$))\n\n$cntr$ = Signature Counter."
 - EMPTYLINE:
 - A:
     ASM:
@@ -54,7 +54,7 @@ sequence:
 - W:
     S:
       arrow: "$SignData$"
-      to: "1. Verify the $SignData$ signature by $K.pub$"
+      to: "1. Verify the $SignData$ signature by $Auth.pub$"
 - S:
     W:
       arrow: "Return verification result"
