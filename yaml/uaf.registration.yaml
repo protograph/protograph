@@ -16,32 +16,33 @@ sequence:
 - B: {W: {arrow: "HTTP POST {$u$, $pwd$}", to: "Verify $u$, $pwd$"}}
 - W: 
     S: 
-      arrow: "Start the UAF Registration"
+      arrow: "Start UAF Registration"
       to: "Generate Auth Policy ($p$)"
 - S:
     W:
-      arrow: "Send UAF Registration Request = \n($a$ = APP_ID, $s$ = SESSION_ID, $c$ = CHALLENGE, $u$, $p$)"
+      arrow: "Send UAF Registration Request = \n($a$ = APP_ID, $c$ = CHALLENGE, $u$, $p$)"
 - W:
     B:
-      arrow: "HTTP 200 OK ($a$, $s$, $u$, $c$, $p$)"
+      arrow: "HTTP 200 OK ($a$, $u$, $c$, $p$)"
 - B:
     C:
-      arrow: "$a$, $s$, $u$, $c$, $p$"
+      arrow: "$a$, $u$, $c$, $p$"
 - C:
     ASM:
-      arrow: "$a$, $u$, $ak$, $fc$ = hash($fcp$), ..."
-      from: "1. Select authenticator(s) according to $p$\n2. Obtain the FACET_ID and TLS_DATA\n3. Generate the access token $ak$ = hash($a$, NONCE, PERSONAL_ID, CALLER_ID)\n4. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)"
+      arrow: "$a$, $u$, $fc$ = hash($fcp$)"
+      from: "1. Select authenticator(s) according to $p$\n2. Obtain the FACET_ID and TLS_DATA\n3. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)"
+      to: "1. Generate the access token $ak$ = hash($a$, NONCE, PERSONAL_ID, CALLER_ID)"
 - EMPTYLINE:
 - ASM:
     A:
-      arrow: "Send Register Command\n($a$, $u$, $ak$, $fc$, ...)"
+      arrow: "Send Register Command\n($a$, $u$, $ak$, $fc$)"
 - A:
     U:
       arrow: "Trigger local user verification"
 - U:
     A:
       arrow: "User interacts with Authenticator(s)"
-      to: "1. Generate UAuth Key Pair = ($K.pub$, $K.priv$) for this handle $h$ = ($a$, $u$) by $ak$\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $K.pub$, $fc$, $Att.cert$, $sig$ = signature_by_$Att.priv$($AAID$, $K.pub$, $fc$, $Att.pub$, ...), ...)\n\n$AAID$ = Authenticator Attestation ID\n$Att.cert$ = Authenticator Certificate\n$Att.pub$, $Att.priv$ = Authenticator Key Pair"
+      to: "1. Generate UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ = ($a$, $u$) by $ak$\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Auth.pub$, $fc$, $Att.cert$, $reg-cntr$, $cntr$, $sig$ = signature_by_$Att.priv$($AAID$, $Auth.pub$, $fc$, $Att.pub$, $reg-cntr$, $cntr$))\n\n$AAID$ = Authenticator Attestation ID\n$Att.cert$ = Authenticator Certificate\n$Att.pub$, $Att.priv$ = Authenticator Key Pair\n$reg-cntr$ = Registration Counter\n$cntr$ = Signature Counter"
 - EMPTYLINE:
 - A:
     ASM:
@@ -58,7 +59,7 @@ sequence:
 - W:
     S:
       arrow: "$KRD$"
-      to: "1. Verify the $KRD$ signature by $Att.pub$\n2. Store $K.pub$ for this $h$"
+      to: "1. Verify the $KRD$ signature by $Att.pub$\n2. Store $Auth.pub$ for this $h$"
 - S:
     W:
       arrow: "Return verification result"
