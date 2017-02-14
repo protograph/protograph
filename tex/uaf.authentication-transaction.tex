@@ -41,10 +41,10 @@
 	\mess[0]{B}{HTTP GET https://webapp?purchase}{W}{black,->}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {};
-	\mess[0]{W}{Generate UAF Authentication Request}{S}{black,->}
+	\mess[0]{W}{Start UAF Authentication/Transaction Request}{S}{black,->}
 	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{Generate\\CHALLENGE ($c$),\\Auth Policy ($p$),\\and Transaction Text ($t$)\\NOTE: $t$ is present in transaction confirmation ONLY.}};
-	\mess[0]{S}{$c$, $p$, $t$}{W}{black,->}
+	\node [anchor=west] at (mess to) {\shortstack[l]{Generate\\CHALLENGE ($c$),\\Auth Policy ($p$),\\and Transaction Text ($t$)\\\\$t$ is present in transaction\\confirmation ONLY.}};
+	\mess[0]{S}{Send UAF Authentication/Transaction Request = ($c$, $p$, $t$)}{W}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
 	\mess[0]{W}{HTTP 200 OK ($a$ = APP_ID, $c$, $p$, $t$)}{B}{black,->}
@@ -65,7 +65,7 @@
 	\node [anchor=east] at (mess to) {};
 	\mess[0]{U}{User Verified}{A}{black,->}
 	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{1. Unlock UAuth Key Pair = ($K.pub$, $K.priv$) for this handle $h$ by $ak$\\2. Generate a nonce ($n$)\\3. Generate the Sign Data = $SignData$ = ($fc$, $n$, $cntr$, $t$, $sig$ = signature_by_$K.priv$($fc$, $n$, $cntr$, $t$))}};
+	\node [anchor=west] at (mess to) {\shortstack[l]{1. Unlock UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ by $ak$\\2. Generate a nonce ($n$)\\3. Generate the Sign Data = $SignData$ = ($fc$, $n$, $cntr$, $t$, $sig$ = signature_by_$Auth.priv$($fc$, $n$, $cntr$, $t$))\\\\$cntr$ = Signature Counter.}};
   \postlevel
 	\mess[0]{A}{$SignData$}{ASM}{black,->}
 	\node [anchor=east] at (mess from) {};
@@ -81,7 +81,7 @@
 	\node [anchor=west] at (mess to) {};
 	\mess[0]{W}{$SignData$}{S}{black,->}
 	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {1. Verify the $SignData$ signature by $K.pub$};
+	\node [anchor=west] at (mess to) {1. Verify the $SignData$ signature by $Auth.pub$};
 	\mess[0]{S}{Return verification result}{W}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};

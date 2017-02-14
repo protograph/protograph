@@ -53,23 +53,23 @@
 	\mess[0]{B}{HTTP POST {$u$, $pwd$}}{W}{black,->}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {Verify $u$, $pwd$};
-	\mess[0]{W}{Start the UAF Registration}{S}{black,->}
+	\mess[0]{W}{Start UAF Registration}{S}{black,->}
 	\node [anchor=east] at (mess from) {};
 	\node [anchor=west] at (mess to) {Generate Auth Policy ($p$)};
-	\mess[0]{S}{\shortstack[l]{Send UAF Registration Request = \\($a$ = APP_ID, $s$ = SESSION_ID, $c$ = CHALLENGE, $u$, $p$)}}{W}{black,->}
+	\mess[0]{S}{\shortstack[l]{Send UAF Registration Request = \\($a$ = APP_ID, $c$ = CHALLENGE, $u$, $p$)}}{W}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
-	\mess[0]{W}{HTTP 200 OK ($a$, $s$, $u$, $c$, $p$)}{B}{black,->}
+	\mess[0]{W}{HTTP 200 OK ($a$, $u$, $c$, $p$)}{B}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
-	\mess[0]{B}{$a$, $s$, $u$, $c$, $p$}{C}{black,->}
+	\mess[0]{B}{$a$, $u$, $c$, $p$}{C}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
-	\mess[0]{C}{$a$, $u$, $ak$, $fc$ = hash($fcp$), ...}{ASM}{black,->}
-	\node [anchor=west] at (mess from) {\shortstack[l]{1. Select authenticator(s) according to $p$\\2. Obtain the FACET_ID and TLS_DATA\\3. Generate the access token $ak$ = hash($a$, NONCE, PERSONAL_ID, CALLER_ID)\\4. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)}};
-	\node [anchor=east] at (mess to) {};
+	\mess[0]{C}{$a$, $u$, $fc$ = hash($fcp$)}{ASM}{black,->}
+	\node [anchor=west] at (mess from) {\shortstack[l]{1. Select authenticator(s) according to $p$\\2. Obtain the FACET_ID and TLS_DATA\\3. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)}};
+	\node [anchor=east] at (mess to) {1. Generate the access token $ak$ = hash($a$, NONCE, PERSONAL_ID, CALLER_ID)};
   \postlevel
-	\mess[0]{ASM}{\shortstack[l]{Send Register Command\\($a$, $u$, $ak$, $fc$, ...)}}{A}{black,->}
+	\mess[0]{ASM}{\shortstack[l]{Send Register Command\\($a$, $u$, $ak$, $fc$)}}{A}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
 	\mess[0]{A}{Trigger local user verification}{U}{black,->}
@@ -77,7 +77,7 @@
 	\node [anchor=east] at (mess to) {};
 	\mess[0]{U}{User interacts with Authenticator(s)}{A}{black,->}
 	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{1. Generate UAuth Key Pair = ($K.pub$, $K.priv$) for this handle $h$ = ($a$, $u$) by $ak$\\2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $K.pub$, $fc$, $Att.cert$, $sig$ = signature_by_$Att.priv$($AAID$, $K.pub$, $fc$, $Att.pub$, ...), ...)\\\\$AAID$ = Authenticator Attestation ID\\$Att.cert$ = Authenticator Certificate\\$Att.pub$, $Att.priv$ = Authenticator Key Pair}};
+	\node [anchor=west] at (mess to) {\shortstack[l]{1. Generate UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ = ($a$, $u$) by $ak$\\2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Auth.pub$, $fc$, $Att.cert$, $reg-cntr$, $cntr$, $sig$ = signature_by_$Att.priv$($AAID$, $Auth.pub$, $fc$, $Att.pub$, $reg-cntr$, $cntr$))\\\\$AAID$ = Authenticator Attestation ID\\$Att.cert$ = Authenticator Certificate\\$Att.pub$, $Att.priv$ = Authenticator Key Pair\\$reg-cntr$ = Registration Counter\\$cntr$ = Signature Counter}};
   \postlevel
 	\mess[0]{A}{$KRD$}{ASM}{black,->}
 	\node [anchor=east] at (mess from) {};
@@ -93,7 +93,7 @@
 	\node [anchor=west] at (mess to) {};
 	\mess[0]{W}{$KRD$}{S}{black,->}
 	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{1. Verify the $KRD$ signature by $Att.pub$\\2. Store $K.pub$ for this $h$}};
+	\node [anchor=west] at (mess to) {\shortstack[l]{1. Verify the $KRD$ signature by $Att.pub$\\2. Store $Auth.pub$ for this $h$}};
 	\mess[0]{S}{Return verification result}{W}{black,->}
 	\node [anchor=west] at (mess from) {};
 	\node [anchor=east] at (mess to) {};
