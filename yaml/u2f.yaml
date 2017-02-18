@@ -1,0 +1,25 @@
+title: U2F Protocol
+actor:
+- U: U2F Device
+- C: Client
+- S: Server
+sequence:
+- C:
+    S:
+      arrow: "HTTPS POST $u$ = USERNAME / $p$ = PASSWORD"
+      to: "1. Verify $u$ $p$ pair\n2. Generate CHALLENGE ($c$)\n3. Lookup user's public key ($K.pub$) associated by a handle ($h$)"
+- S:
+    C:
+      arrow: "HTTPS $c$, $h$, APP_ID"
+- C:
+    U:
+      arrow: "Send $c$, $h$, APP_ID, $origin$, TLS_DATA"
+      from: "1. Extract the $origin$ (aka URI)\n2. Extract TLS_DATA"
+      to: "1. User interacts with the device\n2. Lookup the $K.priv$ associated by APP_ID and $h$\n3. Sign the data with private key ($K.priv$)\n$sig$ = signature_by_K.priv($c$, APP_ID, $counter$, $origin$, TLS_DATA)\n$counter$ = Signature Counter"
+- U:
+    C:
+      arrow: "Send $r$ = RESPONSE = $sig$, $c$, APP_ID, $counter$, $origin$, TLS_DATA"
+- C:
+    S:
+      arrow: "HTTPS POST $r$"
+      to: "1. Verify $r$ with $K.pub$\n2. Check $counter$, $origin$ and TLS_DATA"
