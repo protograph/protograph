@@ -1,0 +1,37 @@
+title: SAML v2 Authentication Request (Web Browser SSO Profile)
+actor:
+- U: User / Browser
+- SP: Service Provider
+- IP: Identity Provider
+sequence:
+- U:
+    SP:
+      arrow: "HTTPS GET https://SP/resource\nfrom the Service Provider"
+      to: "The SP identifies that the $SubjectID$\nis coming from a preconfigured\nIdentity Provider"
+- EMPTYLINE:
+- SP:
+    U:
+      arrow: "Return an XHTML form\nwith $SAMLRequest$,\n$RelayState$"
+      from: "Generate the $SAMLRequest$\nand $RelayState$"
+- EMPTYLINE:
+- U:
+    IP:
+      arrow: "HTTPS POST https://IP/SAML2/SSO/POST\n$SAMLRequest$, $RelayState$"
+      to: "Associate the $SAMLRequest$ and $RelayState$\nwith $SubjectID$"
+- IP:
+    U:
+      arrow: "Authentication flow between $SubjectID$"
+- U:
+    IP:
+      arrow: "Successful authentication of $SubjectID$"
+- EMPTYLINE:
+- IP:
+    U:
+      arrow: "Return an XHTML form\nwith $SAMLResponse$,\n$RelayState$"
+- U:
+    SP:
+      arrow: "HTTPS POST https://SP/SMAL2/SSO/POST\nwith $SAMLResponse$, $RelayState$"
+      to: "Assertion of the $SAMLResponse$\n and $RelayState$"
+- SP:
+    U:
+      arrow: "HTTPS 302 Redirect to https://SP/resource"
