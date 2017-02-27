@@ -27,11 +27,18 @@ sequence:
 - B:
     C:
       arrow: "$a$, $u$, $c$, $p$"
+      to: "1. Obtain the TLS_DATA"
+- C:
+    W:
+      arrow: "Get FACET_ID by $a$"
+- W:
+    C:
+      arrow: "Return list of FACET_ID(s)"
 - C:
     ASM:
       arrow: "$a$, $u$, $fc$ = hash($fcp$)"
-      from: "1. Select authenticator(s) according to $p$\n2. Obtain the FACET_ID and TLS_DATA\n3. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)"
-      to: "1. Generate the access token $ak$ = hash($a$, NONCE, PERSONAL_ID, CALLER_ID)"
+      from: "1. Select authenticator(s) according to $p$\n2. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)"
+      to: "1. Generate the access token\n$ak$ = hash($a$, NONCE, PERSONA_ID, CALLER_ID)\nCALLER_ID is the platform ID assigned to the FIDO Client\nPERSONA_ID is the user ID on the platform"
 - EMPTYLINE:
 - ASM:
     A:
@@ -39,10 +46,11 @@ sequence:
 - A:
     U:
       arrow: "Trigger local user verification"
+- EMPTYLINE:
 - U:
     A:
       arrow: "User interacts with Authenticator(s)"
-      to: "1. Generate UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ = ($a$, $u$) by $ak$\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Auth.pub$, $fc$, $Att.cert$, $reg-cntr$, $cntr$, $sig$ = signature_by_$Att.priv$($AAID$, $Auth.pub$, $fc$, $Att.pub$, $reg-cntr$, $cntr$))\n\n$AAID$ = Authenticator Attestation ID\n$Att.cert$ = Authenticator Certificate\n$Att.pub$, $Att.priv$ = Authenticator Key Pair\n$reg-cntr$ = Registration Counter\n$cntr$ = Signature Counter"
+      to: "1. Generate UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ = ($a$, $u$) by $ak$\n2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Auth.pub$, $fc$, $Att.cert$, $reg-cntr$, $cntr$, $sig$ = signature_by_$Att.priv$($AAID$, $Auth.pub$, $fc$, $Att.pub$, $reg-cntr$, $cntr$))\n$AAID$ = Authenticator Attestation ID\n$Att.cert$ = Authenticator Certificate\n$Att.pub$, $Att.priv$ = Authenticator Key Pair\n$reg-cntr$ = Registration Counter\n$cntr$ = Signature Counter"
 - EMPTYLINE:
 - A:
     ASM:
