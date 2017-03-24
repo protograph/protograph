@@ -1,0 +1,76 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usepackage{hyperref}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+}
+\begin{document}
+\sffamily
+\small
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
+\newinst[0]{C}{Client}
+\newinst[6]{S}{Server}
+\mess[0]{C}{\shortstack[l]{version, timestamp, random, session,\\cipher suites, compression methods,\\extensions (signature algorithms)}}{S}{black,->}
+\node [anchor=east] at (mess from) {ClientHello};
+\node [anchor=west] at (mess to) {};
+\postlevel
+\mess[0]{S}{\shortstack[l]{version, timestamp, random, session,\\cipher suites, compression methods,\\extensions}}{C}{black,->}
+\node [anchor=west] at (mess from) {ServerHello};
+\node [anchor=east] at (mess to) {};
+\postlevel
+\mess[0]{S}{list of certificate}{C}{black,->}
+\node [anchor=west] at (mess from) {Certificate. OPTIONAL};
+\node [anchor=east] at (mess to) {};
+\postlevel
+\mess[0]{S}{DH parameters ($p, g, g^x \mathsf{ mod } p)$, signature}{C}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{ServerKeyExchange. OPTIONAL\\(for DHE_DSS, DHE_RSA or DH_anon)}};
+\node [anchor=east] at (mess to) {};
+\postlevel
+\mess[0]{S}{\shortstack[l]{acceptable certificate type,\\signature and hash algorithms,\\certificate authorities}}{C}{black,->}
+\node [anchor=west] at (mess from) {CertificateRequest. OPTIONAL};
+\node [anchor=east] at (mess to) {};
+\mess[0]{S}{}{C}{black,->}
+\node [anchor=west] at (mess from) {ServerHelloDone};
+\node [anchor=east] at (mess to) {};
+\mess[0]{C}{Certificate*}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{ClientKeyExchange}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{CertificateVerify*}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{[ChangeCipherSpec]}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{Finished}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{S}{[ChangeCipherSpec]}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{S}{Finished}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{C}{Application Data}{S}{black,<->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\end{sequencediagram}
+\end{document}
