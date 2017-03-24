@@ -21,4 +21,4 @@ Generating protograph:
 make all
 ```
 
-Please see SCHEMA.md for how to write a protograph in YAML.
+Please see yaml/helloworld.yaml and tex/helloworld.pdf to get a taste of how the YAML-to-PDF conversion works.
