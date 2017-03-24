@@ -18,16 +18,12 @@
   \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
   {#3};
 }
-
 \begin{document}
-
-	\sffamily
-	\small
-
-    \begin{sequencediagram}
-    \tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
-
-	\def\unitfactor{1.2}
+\sffamily
+\small
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
 \newinst[0]{U}{User}
 \newinst[6]{A}{Authenticator}
 \newinst[6]{ASM}{Authenticator Specific Modules}
@@ -35,78 +31,77 @@
 \newinst[6]{B}{User Agent}
 \newinst[6]{W}{Web Server}
 \newinst[6]{S}{FIDO Server}
-	\mess[0]{U}{User clicks on https://webapp}{B}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{B}{HTTP GET https://webapp}{W}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{W}{HTTP 200 OK (login form returns)}{B}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{B}{Render the login form}{U}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{U}{\shortstack[l]{User enters $u$ = USERNAME, $pwd$ = PASMSWORD\\and submits}}{B}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{B}{HTTP POST {$u$, $pwd$}}{W}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {Verify $u$, $pwd$};
-	\mess[0]{W}{Start UAF Registration}{S}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {Generate Auth Policy ($p$)};
-	\mess[0]{S}{\shortstack[l]{Send UAF Registration Request = \\($a$ = APP_ID, $c$ = CHALLENGE, $u$, $p$)}}{W}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{W}{HTTP 200 OK ($a$, $u$, $c$, $p$)}{B}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{B}{$a$, $u$, $c$, $p$}{C}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {1. Obtain the TLS_DATA};
-	\mess[0]{C}{Get FACET_ID by $a$}{W}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{W}{Return list of FACET_ID(s)}{C}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{C}{$a$, $u$, $fc$ = hash($fcp$)}{ASM}{black,->}
-	\node [anchor=west] at (mess from) {\shortstack[l]{1. Select authenticator(s) according to $p$\\2. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)}};
-	\node [anchor=east] at (mess to) {\shortstack[l]{1. Generate the access token\\$ak$ = hash($a$, NONCE, PERSONA_ID, CALLER_ID)\\CALLER_ID is the platform ID assigned to the FIDO Client\\PERSONA_ID is the user ID on the platform}};
-  \postlevel
-	\mess[0]{ASM}{\shortstack[l]{Send Register Command\\($a$, $u$, $ak$, $fc$)}}{A}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{A}{Trigger local user verification}{U}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-  \postlevel
-	\mess[0]{U}{User interacts with Authenticator(s)}{A}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{1. Generate UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ = ($a$, $u$) by $ak$\\2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Auth.pub$, $fc$, $Att.cert$, $reg-cntr$, $cntr$, $sig$ = signature_by_$Att.priv$($AAID$, $Auth.pub$, $fc$, $Att.pub$, $reg-cntr$, $cntr$))\\$AAID$ = Authenticator Attestation ID\\$Att.cert$ = Authenticator Certificate\\$Att.pub$, $Att.priv$ = Authenticator Key Pair\\$reg-cntr$ = Registration Counter\\$cntr$ = Signature Counter}};
-  \postlevel
-	\mess[0]{A}{$KRD$}{ASM}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{ASM}{$KRD$}{C}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{C}{$KRD$}{B}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{B}{$KRD$}{W}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{W}{$KRD$}{S}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{1. Verify the $KRD$ signature by $Att.pub$\\2. Store $Auth.pub$ for this $h$}};
-	\mess[0]{S}{Return verification result}{W}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{W}{HTTP 200 OK (verification result)}{B}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-
-    \end{sequencediagram}
+\mess[0]{U}{User clicks on https://webapp}{B}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{B}{HTTP GET https://webapp}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{W}{HTTP 200 OK (login form returns)}{B}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{B}{Render the login form}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{U}{\shortstack[l]{User enters $u$ = USERNAME, $pwd$ = PASMSWORD\\and submits}}{B}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{B}{HTTP POST {$u$, $pwd$}}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {Verify $u$, $pwd$};
+\mess[0]{W}{Start UAF Registration}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {Generate Auth Policy ($p$)};
+\mess[0]{S}{\shortstack[l]{Send UAF Registration Request = \\($a$ = APP_ID, $c$ = CHALLENGE, $u$, $p$)}}{W}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{W}{HTTP 200 OK ($a$, $u$, $c$, $p$)}{B}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{B}{$a$, $u$, $c$, $p$}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {1. Obtain the TLS_DATA};
+\mess[0]{C}{Get FACET_ID by $a$}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{W}{Return list of FACET_ID(s)}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{C}{$a$, $u$, $fc$ = hash($fcp$)}{ASM}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{1. Select authenticator(s) according to $p$\\2. $fcp$ = ($a$, $c$, FACET_ID, TLS_DATA)}};
+\node [anchor=east] at (mess to) {\shortstack[l]{1. Generate the access token\\$ak$ = hash($a$, NONCE, PERSONA_ID, CALLER_ID)\\CALLER_ID is the platform ID assigned to the FIDO Client\\PERSONA_ID is the user ID on the platform}};
+\postlevel
+\mess[0]{ASM}{\shortstack[l]{Send Register Command\\($a$, $u$, $ak$, $fc$)}}{A}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{A}{Trigger local user verification}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\postlevel
+\mess[0]{U}{User interacts with Authenticator(s)}{A}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {\shortstack[l]{1. Generate UAuth Key Pair = ($Auth.pub$, $Auth.priv$) for this handle $h$ = ($a$, $u$) by $ak$\\2. Generate the Key Registration Data = $KRD$ = ($AAID$, $h$, $Auth.pub$, $fc$, $Att.cert$, $reg-cntr$, $cntr$, $sig$ = signature_by_$Att.priv$($AAID$, $Auth.pub$, $fc$, $Att.pub$, $reg-cntr$, $cntr$))\\$AAID$ = Authenticator Attestation ID\\$Att.cert$ = Authenticator Certificate\\$Att.pub$, $Att.priv$ = Authenticator Key Pair\\$reg-cntr$ = Registration Counter\\$cntr$ = Signature Counter}};
+\postlevel
+\mess[0]{A}{$KRD$}{ASM}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{ASM}{$KRD$}{C}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{$KRD$}{B}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{B}{$KRD$}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{W}{$KRD$}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {\shortstack[l]{1. Verify the $KRD$ signature by $Att.pub$\\2. Store $Auth.pub$ for this $h$}};
+\mess[0]{S}{Return verification result}{W}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{W}{HTTP 200 OK (verification result)}{B}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\end{sequencediagram}
 \end{document}

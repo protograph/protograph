@@ -16,17 +16,11 @@ before_install:
 - chmod 600 deploy.key
 
 install:
-- go get -u github.com/protograph/protographer/cmd/protographer
-- docker pull yukinying/latex
+- make prepare
 
 script:
-- protographer -in yaml -out tex
-- set -e; for file in tex/*.tex; do docker run -v $(pwd)/tex:/tex --workdir /tex --rm
-  --name latex yukinying/latex pdflatex --halt-on-error "/$file"; done
+- make all
 
 after_success:
 - echo "SUCCESS!"
-- git add tex/*.tex tex/*.pdf
-- git commit -m 'generated TeX and PDF from Travis [skip ci]'
-- git remote add deploy git@github.com:protograph/protograph.git
-- GIT_SSH_COMMAND='ssh -i deploy.key' git push deploy HEAD:master
+- make commit

@@ -18,51 +18,46 @@
   \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
   {#3};
 }
-
 \begin{document}
-
-	\sffamily
-	\small
-
-    \begin{sequencediagram}
-    \tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
-
-	\def\unitfactor{1.2}
+\sffamily
+\small
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
 \newinst[0]{U}{Resource Owner}
 \newinst[6]{UA}{User Agent}
 \newinst[6]{C}{Client}
 \newinst[6]{AS}{Authz Server}
 \newinst[6]{S}{Resource Server}
-	\mess[0]{C}{\shortstack[l]{302 AuthServer: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE,\\ CHALLENGE}}{UA}{black,->}
-	\node [anchor=west] at (mess from) {\shortstack[l]{VERIFIER = SECURE_RNG() \\ CHALLENGE = SHA256(VERIFIER)}};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{UA}{\shortstack[l]{POST /auth \\ CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE, CHALLENGE}}{AS}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{AS}{prompt to login}{U}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{U}{signing in}{AS}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{AS}{asking for consent}{U}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{U}{yes!}{AS}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{AS}{\shortstack[l]{302 CLIENTURL: \\AUTHCODE, CLIENTSTATE}}{UA}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{UA}{\shortstack[l]{POST /cb \\ AUTHCODE, CLIENTSTATE}}{C}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{C}{AUTHCODE, VERIFIER}{AS}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {CHALLENGE $\stackrel{?}{=}$ SHA256(VERIFIER)};
-	\mess[0]{AS}{\shortstack[l]{200 OK: \\ACCESSTOKEN}}{C}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-
-    \end{sequencediagram}
+\mess[0]{C}{\shortstack[l]{302 AuthServer: \\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE,\\ CHALLENGE}}{UA}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{VERIFIER = SECURE_RNG() \\ CHALLENGE = SHA256(VERIFIER)}};
+\node [anchor=east] at (mess to) {};
+\mess[0]{UA}{\shortstack[l]{POST /auth \\ CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE, CHALLENGE}}{AS}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{AS}{prompt to login}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{U}{signing in}{AS}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{AS}{asking for consent}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{U}{yes!}{AS}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{AS}{\shortstack[l]{302 CLIENTURL: \\AUTHCODE, CLIENTSTATE}}{UA}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{UA}{\shortstack[l]{POST /cb \\ AUTHCODE, CLIENTSTATE}}{C}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{AUTHCODE, VERIFIER}{AS}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {CHALLENGE $\stackrel{?}{=}$ SHA256(VERIFIER)};
+\mess[0]{AS}{\shortstack[l]{200 OK: \\ACCESSTOKEN}}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\end{sequencediagram}
 \end{document}
