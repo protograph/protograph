@@ -18,34 +18,54 @@
   \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
   {#3};
 }
-
 \begin{document}
-
-	\sffamily
-	\small
-
-    \begin{sequencediagram}
-    \tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
-
-	\def\unitfactor{1.2}
+\sffamily
+\small
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
 \newinst[0]{U}{U2F Device}
-\newinst[6]{C}{Client}
-\newinst[6]{S}{Server}
-	\mess[0]{C}{HTTPS POST $u$ = USERNAME / $p$ = PASSWORD}{S}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{1. Verify $u$ $p$ pair\\2. Generate CHALLENGE ($c$)\\3. Lookup user's public key ($K.pub$) associated by a handle ($h$)}};
-	\mess[0]{S}{HTTPS $c$, $h$, APP_ID}{C}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{C}{Send $c$, $h$, APP_ID, $origin$, TLS_DATA}{U}{black,->}
-	\node [anchor=west] at (mess from) {\shortstack[l]{1. Extract the $origin$ (aka URI)\\2. Extract TLS_DATA}};
-	\node [anchor=east] at (mess to) {\shortstack[l]{1. User interacts with the device\\2. Lookup the $K.priv$ associated by APP_ID and $h$\\3. Sign the data with private key ($K.priv$)\\$sig$ = signature_by_K.priv($c$, APP_ID, $counter$, $origin$, TLS_DATA)\\$counter$ = Signature Counter}};
-	\mess[0]{U}{Send $r$ = RESPONSE = $sig$, $c$, APP_ID, $counter$, $origin$, TLS_DATA}{C}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{C}{HTTPS POST $r$}{S}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {\shortstack[l]{1. Verify $r$ with $K.pub$\\2. Check $counter$, $origin$ and TLS_DATA}};
-
-    \end{sequencediagram}
+\newinst[6]{C}{Browser (Client)}
+\newinst[6]{S}{Web Server (Relying Party)}
+\mess[0]{C}{Start U2F Registration}{S}{blue,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{First factor authentication (username and password)}{S}{black,<->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{S}{challenge}{C}{black,->}
+\node [anchor=west] at (mess from) {challenge $\gets$ RANDOM};
+\node [anchor=east] at (mess to) {\shortstack[l]{o = origin\\c = hash(challenge + TLS channel ID)}};
+\mess[0]{C}{o, c}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{U}{$\mathsf{PK}_\mathsf{o}, \mathsf{ID}_\mathsf{o}$, s, attestation cert}{C}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{$\mathsf{SK}_\mathsf{o}, \mathsf{PK}_\mathsf{o}, \mathsf{ID}_\mathsf{o} \gets $ GenKey(o)\\s = sign($\mathsf{c}, \mathsf{PK}_\mathsf{o}, \mathsf{ID}_\mathsf{o}$)}};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{\shortstack[l]{challenge, TLS channel id,\\$\mathsf{PK}_\mathsf{o}, \mathsf{ID}_\mathsf{o}$, s,\\attestation cert}}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\postlevel
+\mess[0]{C}{Start U2F Authentication}{S}{blue,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{First factor authentication (username and password)}{S}{black,<->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{S}{$\mathsf{ID}_\mathsf{o}$, challenge}{C}{black,->}
+\node [anchor=west] at (mess from) {challenge $\gets$ RANDOM};
+\node [anchor=east] at (mess to) {\shortstack[l]{o = origin\\c = hash(challenge + TLS channel ID)}};
+\mess[0]{C}{o,  $\mathsf{ID}_\mathsf{o}$, c}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{U}{counter, s}{C}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{increment counter\\s = sign(c, counter)}};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{counter, s, challenge, TLS channel ID}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{S}{set-cookie}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\end{sequencediagram}
 \end{document}

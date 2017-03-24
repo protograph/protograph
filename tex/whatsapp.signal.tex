@@ -18,73 +18,68 @@
   \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
   {#3};
 }
-
 \begin{document}
-
-	\sffamily
-	\small
-
-    \begin{sequencediagram}
-    \tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
-
-	\def\unitfactor{1.2}
+\sffamily
+\small
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
 \newinst[0]{I}{initiator: $a$
 }
 \newinst[6]{S}{server}
 \newinst[6]{R}{recipient: $b$
 }
-	\mess[0]{I}{}{S}{white,->}
-	\node [anchor=east] at (mess from) {\shortstack[l]{Notation: $(d, Q) \gets \mathsf{Curve25519()}$ is the key\\generation function that generates $d$ as\\private key and $Q$ as public key.}};
-	\node [anchor=west] at (mess to) {};
-  \postlevel
-	\mess[0]{I}{$Q_{\mathsf{I}_a}, Q_{\mathsf{S}_a}, Q_{\mathsf{O}_a}, \mathsf{Sign}_{d_{\mathsf{I}_a}}(Q_{\mathsf{S}_a})$}{S}{black,->}
-	\node [anchor=east] at (mess from) {\shortstack[l]{Identity Key: $\mathsf{I}_a = (d_{\mathsf{I}_a}, Q_{\mathsf{I}_a})  \gets \mathsf{Curve25519}()$\\Signed Pre Key: $\mathsf{S}_a = (d_{\mathsf{S}_a}, Q_{\mathsf{S}_a}) \gets \mathsf{Curve25519}()$\\One-Time Pre Key: $\mathsf{O}_a = (d_{\mathsf{O}_a}, Q_{\mathsf{O}_a})\gets \mathsf{Curve25519}()$}};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{R}{$Q_{\mathsf{I}_b}, Q_{\mathsf{S}_b}, Q_{\mathsf{O}_b}, \mathsf{Sign}_{d_{\mathsf{I}_b}}(Q_{\mathsf{S}_b})$}{S}{black,->}
-	\node [anchor=west] at (mess from) {\shortstack[l]{Identity Key: $\mathsf{I}_b = (d_{\mathsf{I}_b}, Q_{\mathsf{I}_b})  \gets \mathsf{Curve25519}()$\\Signed Pre Key: $\mathsf{S}_b = (d_{\mathsf{S}_b}, Q_{\mathsf{S}_b}) \gets \mathsf{Curve25519}()$\\One-Time Pre Key: $\mathsf{O}_b = (d_{\mathsf{O}_b}, Q_{\mathsf{O}_b})\gets \mathsf{Curve25519}()$}};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{I}{get recipient public keys}{S}{black,->}
-	\node [anchor=east] at (mess from) {};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{S}{$Q_{\mathsf{I}_b}, Q_{\mathsf{S}_b}, Q_{\mathsf{O}_b}$}{I}{black,->}
-	\node [anchor=west] at (mess from) {};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{I}{$Q_{\mathsf{I}_a}, Q_{\mathsf{E}_a}$}{R}{black,->}
-	\node [anchor=east] at (mess from) {Ephemeral Key: $\mathsf{E}_a = (d_{\mathsf{E}_a}, Q_{\mathsf{E}_a})\gets \mathsf{Curve25519}()$};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{I}{ECDH($\mathsf{I}_a, \mathsf{S}_b$)}{R}{black,<->}
-	\node [anchor=east] at (mess from) {Exchange $K_1$};
-	\node [anchor=west] at (mess to) {Exchange $K_1$};
-	\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{I}_b$)}{R}{black,<->}
-	\node [anchor=east] at (mess from) {Exchange $K_2$};
-	\node [anchor=west] at (mess to) {Exchange $K_2$};
-	\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{S}_b$)}{R}{black,<->}
-	\node [anchor=east] at (mess from) {Exchange $K_3$};
-	\node [anchor=west] at (mess to) {Exchange $K_3$};
-	\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{O}_b$)}{R}{black,<->}
-	\node [anchor=east] at (mess from) {Exchange $K_4$};
-	\node [anchor=west] at (mess to) {Exchange $K_4$};
-	\mess[0]{I}{}{R}{white,->}
-	\node [anchor=east] at (mess from) {\shortstack[l]{$K_\mathsf{master} \gets K_1 \Vert  K_2 \Vert  K_3 \Vert  K_4 $\\$K_\mathsf{root}, K_\mathsf{chain} = \mathsf{HKDF}(K_\mathsf{master})$}};
-	\node [anchor=west] at (mess to) {};
-  \postlevel
-	\mess[0]{I}{cipher, signature, $Q_{\mathsf{E}_a}$}{R}{black,->}
-	\node [anchor=east] at (mess from) {\shortstack[l]{Ephemeral Key: $\mathsf{E}_a = (d_{\mathsf{E}_a}, Q_{\mathsf{E}_a})\gets \mathsf{Curve25519}()$\\$K_\mathsf{message} = \mathsf{HMAC}_{K_\mathsf{chain}}(1) $\\$K_\mathsf{chain} = \mathsf{HMAC}_{K_\mathsf{chain}}(2) $\\$\mathsf{cipher} = \mathsf{Encrypt}_{K_\mathsf{message}}(\mathsf{message})$\\$\mathsf{signature} = \mathsf{HMAC}_{K_\mathsf{message}}(\mathsf{cipher})$}};
-	\node [anchor=west] at (mess to) {\shortstack[l]{$K_\mathsf{master} \gets K_1 \Vert  K_2 \Vert  K_3 \Vert  K_4 $\\$K_\mathsf{root}, K_\mathsf{chain} = \mathsf{HKDF}(K_\mathsf{master})$\\$K_\mathsf{message} = \mathsf{HMAC}_{K_\mathsf{chain}}(1) $\\$K_\mathsf{chain} = \mathsf{HMAC}_{K_\mathsf{chain}}(2) $\\$\mathsf{message} = \mathsf{Decrypt}_{K_\mathsf{message}}(\mathsf{cipher})$}};
-  \postlevel
-	\mess[0]{I}{}{R}{white,->}
-	\node [anchor=east] at (mess from) {Keep sending new messages until recipient responds.};
-	\node [anchor=west] at (mess to) {};
-	\mess[0]{R}{$Q_{\mathsf{E}_b}$}{I}{black,->}
-	\node [anchor=west] at (mess from) {Ephemeral Key: $\mathsf{E}_b = (d_{\mathsf{E}_b}, Q_{\mathsf{E}_b})\gets \mathsf{Curve25519}()$};
-	\node [anchor=east] at (mess to) {};
-	\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{E}_b$)}{R}{black,<->}
-	\node [anchor=east] at (mess from) {\shortstack[l]{Exchange $K_\mathsf{ephemeral}$\\$K_\mathsf{chain}, K_\mathsf{root} = \mathsf{HKDF}(K_\mathsf{root}, K_\mathsf{ephemeral})$}};
-	\node [anchor=west] at (mess to) {\shortstack[l]{Exchange $K_\mathsf{ephemeral}$\\$K_\mathsf{chain}, K_\mathsf{root} = \mathsf{HKDF}(K_\mathsf{root}, K_\mathsf{ephemeral})$}};
-  \postlevel
-	\mess[0]{I}{}{R}{white,->}
-	\node [anchor=east] at (mess from) {\shortstack[l]{As $K_\mathsf{chain}$ and $K_\mathsf{root}$ are rolled,\\the rest of the protocol follows from above.}};
-	\node [anchor=west] at (mess to) {};
-
-    \end{sequencediagram}
+\mess[0]{I}{}{S}{white,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{Notation: $(d, Q) \gets \mathsf{Curve25519()}$ is the key\\generation function that generates $d$ as\\private key and $Q$ as public key.}};
+\node [anchor=west] at (mess to) {};
+\postlevel
+\mess[0]{I}{$Q_{\mathsf{I}_a}, Q_{\mathsf{S}_a}, Q_{\mathsf{O}_a}, \mathsf{Sign}_{d_{\mathsf{I}_a}}(Q_{\mathsf{S}_a})$}{S}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{Identity Key: $\mathsf{I}_a = (d_{\mathsf{I}_a}, Q_{\mathsf{I}_a})  \gets \mathsf{Curve25519}()$\\Signed Pre Key: $\mathsf{S}_a = (d_{\mathsf{S}_a}, Q_{\mathsf{S}_a}) \gets \mathsf{Curve25519}()$\\One-Time Pre Key: $\mathsf{O}_a = (d_{\mathsf{O}_a}, Q_{\mathsf{O}_a})\gets \mathsf{Curve25519}()$}};
+\node [anchor=west] at (mess to) {};
+\mess[0]{R}{$Q_{\mathsf{I}_b}, Q_{\mathsf{S}_b}, Q_{\mathsf{O}_b}, \mathsf{Sign}_{d_{\mathsf{I}_b}}(Q_{\mathsf{S}_b})$}{S}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{Identity Key: $\mathsf{I}_b = (d_{\mathsf{I}_b}, Q_{\mathsf{I}_b})  \gets \mathsf{Curve25519}()$\\Signed Pre Key: $\mathsf{S}_b = (d_{\mathsf{S}_b}, Q_{\mathsf{S}_b}) \gets \mathsf{Curve25519}()$\\One-Time Pre Key: $\mathsf{O}_b = (d_{\mathsf{O}_b}, Q_{\mathsf{O}_b})\gets \mathsf{Curve25519}()$}};
+\node [anchor=east] at (mess to) {};
+\mess[0]{I}{get recipient public keys}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{S}{$Q_{\mathsf{I}_b}, Q_{\mathsf{S}_b}, Q_{\mathsf{O}_b}$}{I}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{I}{$Q_{\mathsf{I}_a}, Q_{\mathsf{E}_a}$}{R}{black,->}
+\node [anchor=east] at (mess from) {Ephemeral Key: $\mathsf{E}_a = (d_{\mathsf{E}_a}, Q_{\mathsf{E}_a})\gets \mathsf{Curve25519}()$};
+\node [anchor=west] at (mess to) {};
+\mess[0]{I}{ECDH($\mathsf{I}_a, \mathsf{S}_b$)}{R}{black,<->}
+\node [anchor=east] at (mess from) {Exchange $K_1$};
+\node [anchor=west] at (mess to) {Exchange $K_1$};
+\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{I}_b$)}{R}{black,<->}
+\node [anchor=east] at (mess from) {Exchange $K_2$};
+\node [anchor=west] at (mess to) {Exchange $K_2$};
+\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{S}_b$)}{R}{black,<->}
+\node [anchor=east] at (mess from) {Exchange $K_3$};
+\node [anchor=west] at (mess to) {Exchange $K_3$};
+\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{O}_b$)}{R}{black,<->}
+\node [anchor=east] at (mess from) {Exchange $K_4$};
+\node [anchor=west] at (mess to) {Exchange $K_4$};
+\mess[0]{I}{}{R}{white,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{$K_\mathsf{master} \gets K_1 \Vert  K_2 \Vert  K_3 \Vert  K_4 $\\$K_\mathsf{root}, K_\mathsf{chain} = \mathsf{HKDF}(K_\mathsf{master})$}};
+\node [anchor=west] at (mess to) {};
+\postlevel
+\mess[0]{I}{cipher, signature, $Q_{\mathsf{E}_a}$}{R}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{Ephemeral Key: $\mathsf{E}_a = (d_{\mathsf{E}_a}, Q_{\mathsf{E}_a})\gets \mathsf{Curve25519}()$\\$K_\mathsf{message} = \mathsf{HMAC}_{K_\mathsf{chain}}(1) $\\$K_\mathsf{chain} = \mathsf{HMAC}_{K_\mathsf{chain}}(2) $\\$\mathsf{cipher} = \mathsf{Encrypt}_{K_\mathsf{message}}(\mathsf{message})$\\$\mathsf{signature} = \mathsf{HMAC}_{K_\mathsf{message}}(\mathsf{cipher})$}};
+\node [anchor=west] at (mess to) {\shortstack[l]{$K_\mathsf{master} \gets K_1 \Vert  K_2 \Vert  K_3 \Vert  K_4 $\\$K_\mathsf{root}, K_\mathsf{chain} = \mathsf{HKDF}(K_\mathsf{master})$\\$K_\mathsf{message} = \mathsf{HMAC}_{K_\mathsf{chain}}(1) $\\$K_\mathsf{chain} = \mathsf{HMAC}_{K_\mathsf{chain}}(2) $\\$\mathsf{message} = \mathsf{Decrypt}_{K_\mathsf{message}}(\mathsf{cipher})$}};
+\postlevel
+\mess[0]{I}{}{R}{white,->}
+\node [anchor=east] at (mess from) {Keep sending new messages until recipient responds.};
+\node [anchor=west] at (mess to) {};
+\mess[0]{R}{$Q_{\mathsf{E}_b}$}{I}{black,->}
+\node [anchor=west] at (mess from) {Ephemeral Key: $\mathsf{E}_b = (d_{\mathsf{E}_b}, Q_{\mathsf{E}_b})\gets \mathsf{Curve25519}()$};
+\node [anchor=east] at (mess to) {};
+\mess[0]{I}{ECDH($\mathsf{E}_a, \mathsf{E}_b$)}{R}{black,<->}
+\node [anchor=east] at (mess from) {\shortstack[l]{Exchange $K_\mathsf{ephemeral}$\\$K_\mathsf{chain}, K_\mathsf{root} = \mathsf{HKDF}(K_\mathsf{root}, K_\mathsf{ephemeral})$}};
+\node [anchor=west] at (mess to) {\shortstack[l]{Exchange $K_\mathsf{ephemeral}$\\$K_\mathsf{chain}, K_\mathsf{root} = \mathsf{HKDF}(K_\mathsf{root}, K_\mathsf{ephemeral})$}};
+\postlevel
+\mess[0]{I}{}{R}{white,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{As $K_\mathsf{chain}$ and $K_\mathsf{root}$ are rolled,\\the rest of the protocol follows from above.}};
+\node [anchor=west] at (mess to) {};
+\end{sequencediagram}
 \end{document}
