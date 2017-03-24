@@ -1,5 +1,10 @@
 title: Whatsapp Signal Protocol
 
+footnote: |
+  Notation: $(d, Q) <- `Curve25519()`$ is the key
+  generation function that generates $d$ as
+  private key and $Q$ as public key.
+
 actor:
   - I: >
       initiator: $a$
@@ -8,17 +13,7 @@ actor:
       recipient: $b$
 
 sequence:
-
-  - I:
-      S:
-        color: white
-        from: |
-          Notation: $(d, Q) <- `Curve25519()`$ is the key
-          generation function that generates $d$ as
-          private key and $Q$ as public key.
-
-  - EMPTYLINE:
-
+  
   - I:
       S:
         arrow: $Q_{`I`_a}, Q_{`S`_a}, Q_{`O`_a}, `Sign`_{d_{`I`_a}}(Q_{`S`_a})$  # O_i_init..
