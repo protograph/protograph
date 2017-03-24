@@ -20,6 +20,9 @@ clean:
 
 commit:
 	git add $(TEXS) $(PDFS)
+	git commit -m 'generated TeX and PDF from Travis [skip ci]'
+	git remote add deploy git@github.com:protograph/protograph.git
+	GIT_SSH_COMMAND='ssh -i deploy.key' git push deploy HEAD:master
 
 $(TEXDIR)/%.tex: $(YMLDIR)/%.yaml
 	protographer -outdir $(TEXDIR) $<
