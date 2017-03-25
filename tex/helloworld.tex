@@ -45,6 +45,6 @@
 \mess[1]{C}{keep talking}{B}{blue,<->}
 \node [anchor=west] at (mess from) {C says hello};
 \node [anchor=east] at (mess to) {B gets hello};
-\node [anchor=north west] at ([yshift=-20] current bounding box.south west){this is a sample footnote};
+\node [anchor=north west] (rect) at ([yshift=-20] current bounding box.south west) [draw,thick] {this is a sample footnote};
 \end{sequencediagram}
 \end{document}
