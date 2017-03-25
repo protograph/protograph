@@ -29,10 +29,6 @@
 \newinst[6]{S}{server}
 \newinst[6]{R}{recipient: $b$
 }
-\mess[0]{I}{}{S}{white,->}
-\node [anchor=east] at (mess from) {\shortstack[l]{Notation: $(d, Q) \gets \mathsf{Curve25519()}$ is the key\\generation function that generates $d$ as\\private key and $Q$ as public key.}};
-\node [anchor=west] at (mess to) {};
-\postlevel
 \mess[0]{I}{$Q_{\mathsf{I}_a}, Q_{\mathsf{S}_a}, Q_{\mathsf{O}_a}, \mathsf{Sign}_{d_{\mathsf{I}_a}}(Q_{\mathsf{S}_a})$}{S}{black,->}
 \node [anchor=east] at (mess from) {\shortstack[l]{Identity Key: $\mathsf{I}_a = (d_{\mathsf{I}_a}, Q_{\mathsf{I}_a})  \gets \mathsf{Curve25519}()$\\Signed Pre Key: $\mathsf{S}_a = (d_{\mathsf{S}_a}, Q_{\mathsf{S}_a}) \gets \mathsf{Curve25519}()$\\One-Time Pre Key: $\mathsf{O}_a = (d_{\mathsf{O}_a}, Q_{\mathsf{O}_a})\gets \mathsf{Curve25519}()$}};
 \node [anchor=west] at (mess to) {};
@@ -81,5 +77,6 @@
 \mess[0]{I}{}{R}{white,->}
 \node [anchor=east] at (mess from) {\shortstack[l]{As $K_\mathsf{chain}$ and $K_\mathsf{root}$ are rolled,\\the rest of the protocol follows from above.}};
 \node [anchor=west] at (mess to) {};
+\node [anchor=north west] (rect) at ([yshift=-20] current bounding box.south west) [draw,thick] {\shortstack[l]{Notation: $(d, Q) \gets \mathsf{Curve25519()}$ is the key\\generation function that generates $d$ as\\private key and $Q$ as public key.}};
 \end{sequencediagram}
 \end{document}
