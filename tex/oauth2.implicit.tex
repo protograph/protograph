@@ -1,0 +1,51 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usepackage{hyperref}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+}
+\begin{document}
+\sffamily
+\small
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
+\newinst[0]{U}{Resource Owner}
+\newinst[6]{UA}{User Agent}
+\newinst[6]{C}{Client}
+\newinst[6]{AS}{AuthZ Server}
+\mess[0]{U}{Initiate OAuth 2.0 flow}{C}{blue,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{C}{\shortstack[l]{302 AuthServer:\\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{UA}{blue,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{UA}{\shortstack[l]{POST /auth:\\CLIENTID, CLIENTURL, SCOPE, CLIENTSTATE}}{AS}{red,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\mess[0]{AS}{prompt to login and ask for consent}{U}{red,<->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{AS}{\shortstack[l]{302 CLIENTURL:\\ACCESSTOKEN (in URL Fragment), CLIENTSTATE}}{UA}{red,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\mess[0]{UA}{ACCESSTOKEN, CLIENTSTATE}{C}{blue,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\node [anchor=north west] (rect) at ([yshift=-20] current bounding box.south west) [draw,thick] {\shortstack[l]{Implicit mode is optimized for browser based\\clients or applications on mobile devices.}};
+\end{sequencediagram}
+\end{document}
