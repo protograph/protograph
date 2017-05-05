@@ -21,4 +21,4 @@ Generating protograph:
 make all
 ```
 
-Please see yaml/helloworld.yaml and tex/helloworld.pdf to get a taste of how the YAML-to-PDF conversion works.
+Please see https://github.com/protograph/protographer/blob/master/yaml/helloworld.yaml and https://github.com/protograph/protographer/blob/master/tex/helloworld.pdf to get a taste of how the YAML-to-PDF conversion works.
