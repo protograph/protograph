@@ -2,6 +2,7 @@ language: go
 os: linux
 dist: trusty
 sudo: required
+group: edge
 
 branches:
   only:
