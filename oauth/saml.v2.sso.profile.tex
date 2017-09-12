@@ -1,0 +1,85 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+}
+
+%% make text appear as op in math mode
+\newcommand{\textop}[1]{\relax\ifmmode\mathop{\text{#1}}\else\text{#1}\fi}
+\newcommand{\stextop}[1]{\relax\ifmmode\mathop{\text{ #1 }}\else\text{#1}\fi}
+
+\begin{document}
+\sffamily
+\small
+
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
+
+%
+% actors
+%
+\newinst[0]{U}{User / Browser}
+\newinst[6]{SP}{Service Provider}
+\newinst[6]{IP}{Identity Provider}
+
+%
+% sequences
+%
+
+\mess[0]{U}{\shortstack[l]{HTTPS GET https://SP/resource\\from the Service Provider}}{SP}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {\shortstack[l]{The SP identifies that the ${\textop{SubjectID}}$\\is coming from a preconfigured\\Identity Provider}};
+\postlevel
+
+\mess[0]{SP}{\shortstack[l]{Return an XHTML form\\with ${\textop{SAMLRequest}}$,\\${\textop{RelayState}}$}}{U}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{Generate the ${\textop{SAMLRequest}}$\\and ${\textop{RelayState}}$}};
+\node [anchor=east] at (mess to) {};
+\postlevel
+
+\mess[0]{U}{\shortstack[l]{HTTPS POST https://IP/SAML2/SSO/POST\\${\textop{SAMLRequest}}$, ${\textop{RelayState}}$}}{IP}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {\shortstack[l]{Associate the ${\textop{SAMLRequest}}$ and ${\textop{RelayState}}$\\with ${\textop{SubjectID}}$}};
+
+\mess[0]{IP}{Authentication flow between ${\textop{SubjectID}}$}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{U}{Successful authentication of ${\textop{SubjectID}}$}{IP}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\postlevel
+
+\mess[0]{IP}{\shortstack[l]{Return an XHTML form\\with ${\textop{SAMLResponse}}$,\\${\textop{RelayState}}$}}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{U}{\shortstack[l]{HTTPS POST https://SP/SMAL2/SSO/POST\\with ${\textop{SAMLResponse}}$, ${\textop{RelayState}}$}}{SP}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {\shortstack[l]{Assertion of the ${\textop{SAMLResponse}}$\\ and ${\textop{RelayState}}$}};
+
+\mess[0]{SP}{HTTPS 302 Redirect to https://SP/resource}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\end{sequencediagram}
+\end{document}

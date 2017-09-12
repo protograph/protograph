@@ -1,0 +1,57 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+}
+
+%% make text appear as op in math mode
+\newcommand{\textop}[1]{\relax\ifmmode\mathop{\text{#1}}\else\text{#1}\fi}
+\newcommand{\stextop}[1]{\relax\ifmmode\mathop{\text{ #1 }}\else\text{#1}\fi}
+
+\begin{document}
+\sffamily
+\small
+
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
+
+%
+% actors
+%
+\newinst[0]{A}{Alice}
+\newinst[6]{B}{Bob}
+
+%
+% sequences
+%
+
+\mess[1]{A}{$g, p, A$}{B}{black,->}
+\node [anchor=east] at (mess from) {$A = g^a{\textop{ mod }}p$};
+\node [anchor=west] at (mess to) {$B = g^b{\textop{ mod }}p$};
+
+\mess[1]{B}{$B$}{A}{black,->}
+\node [anchor=west] at (mess from) {$K = A^b{\textop{ mod }}p$};
+\node [anchor=east] at (mess to) {$K = B^a{\textop{ mod }}p$};
+
+\end{sequencediagram}
+\end{document}

@@ -1,0 +1,139 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+}
+
+%% make text appear as op in math mode
+\newcommand{\textop}[1]{\relax\ifmmode\mathop{\text{#1}}\else\text{#1}\fi}
+\newcommand{\stextop}[1]{\relax\ifmmode\mathop{\text{ #1 }}\else\text{#1}\fi}
+
+\begin{document}
+\sffamily
+\small
+
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
+
+%
+% actors
+%
+\newinst[0]{C}{Client (a)}
+\newinst[12]{S}{Server (b)}
+
+%
+% sequences
+%
+
+\mess[0]{C}{\shortstack[l]{${\textop{ClientHello}}: r_{\textop{a}}$\\${\textop{KeyShare}}: Q_{\textop{a}}$}}{S}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{$r_{\textop{a }}\xleftarrow{{\textop{random}}} \{0,1\}^{256}$\\${\textop{Ephermal}}{\textop{ key}}: Q_{\textop{a }}\gets d_{\textop{a}}{G}$}};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{S}{\shortstack[l]{${\textop{ServerHello}}: r_{\textop{b}}$\\${\textop{KeyShare}}: Q_{\textop{b}}$}}{C}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{$S_{\textop{early }}\gets{\textop{ Extract}}(0, 0)$\\$r_{\textop{b }}\xleftarrow{{\textop{random}}} \{0,1\}^{256}$\\${\textop{Ephermal}}{\textop{ key}}: Q_{\textop{b }}\gets d_{\textop{b}}{G}$\\${\textop{Key}}{\textop{ exchanged }}{\textop{via}}{\textop{ ECDHE}}: x \gets (x, y) = d_{\textop{a }}Q_{\textop{b}}$}};
+\node [anchor=east] at (mess to) {};
+\postlevel
+
+\mess[0]{S}{}{S}{white,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{$S_{\textop{handshake }}\gets{\textop{ Extract}}({\textop{Derive}}(S_{\textop{early}},{\textop{ \textnormal{\textquotesingle}derived\textnormal{\textquotesingle}}}, \emptyset), x)$\\$S_{\textop{master }}\gets{\textop{ Extract}}({\textop{Derive}}(S_{\textop{handshake}},{\textop{\textnormal{\textquotesingle}derived\textnormal{\textquotesingle}}}, \emptyset), 0)$}};
+\node [anchor=east] at (mess to) {};
+\postlevel
+
+\mess[0]{S}{$\{{\textop{Certificate}}:{\textop{ Public }}{\textop{key}}{\textop{ with }}{\textop{CA}}{\textop{ signature}}\}_{K_{{\textop{handshake}}_{\textop{b}}}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {${\textop{Handshake}}{\textop{ traffic }}{\textop{key}}: K_{{\textop{handshake}}_{\textop{b}}} \gets{\textop{ Derive}}(S_{\textop{handshake}},{\textop{ \textnormal{\textquotesingle}s\ hs\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=east] at (mess to) {${\textop{Handshake}}{\textop{ traffic }}{\textop{key}}: K_{{\textop{handshake}}_{\textop{a}}} \gets{\textop{ Derive}}(S_{\textop{handshake}},{\textop{ \textnormal{\textquotesingle}c\ hs\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+
+\mess[0]{S}{$\{{\textop{CertificateVerify}}:{\textop{ Transcript }}{\textop{with}}{\textop{ ECDSA }}{\textop{signature}}\}_{K_{{\textop{handshake}}_{\textop{b}}}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{S}{$\{{\textop{Finished}}:{\textop{ HMAC}}(K_{\textop{finished}},{\textop{ transcript}})\}_{K_{{\textop{handshake}}_{\textop{b}}}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {${\textop{Finished}}{\textop{ key}}: K_{\textop{finished }}\gets{\textop{ Derive}}(K_{{\textop{handshake}}_{\textop{b}}},{\textop{ \textnormal{\textquotesingle}finished\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{C}{$\{{\textop{Finished}}:{\textop{ HMAC}}(K_{\textop{finished}},{\textop{ transcript}})\}_{K_{{\textop{handshake}}_{\textop{a}}}}$}{S}{black,->}
+\node [anchor=east] at (mess from) {${\textop{Finished}}{\textop{ key}}: K_{\textop{finished }}\gets{\textop{ Derive}}(K_{{\textop{handshake}}_{\textop{a}}},{\textop{ \textnormal{\textquotesingle}finished\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=west] at (mess to) {$S_{\textop{resumption }}\gets{\textop{ Derive}}(S_{\textop{master}},{\textop{ \textnormal{\textquotesingle}res\ master\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+
+\mess[0]{S}{$\{{\textop{Application}}{\textop{ Data}}\}_{K_{{\textop{b}}_0}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {${\textop{Application}}{\textop{ traffic }}{\textop{key}}: K_{{\textop{b}}_0} \gets{\textop{ Derive}}(S_{\textop{master}},{\textop{ \textnormal{\textquotesingle}s\ ap\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{C}{$\{{\textop{Application}}{\textop{ Data}}\}_{K_{{\textop{a}}_0}}$}{S}{black,->}
+\node [anchor=east] at (mess from) {${\textop{Application}}{\textop{ traffic }}{\textop{key}}: K_{{\textop{a}}_0} \gets{\textop{ Derive}}(S_{\textop{master}},{\textop{ \textnormal{\textquotesingle}c\ ap\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{S}{${\textop{NewSessionTicket}}: \{{\textop{session}}{\textop{ key }}{\textop{ID}},{\textop{ IV}},{\textop{ encrypted }}{\textop{state}},{\textop{ HMAC}}(...)\}_{K_{{\textop{b}}_0}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {Creates a pre-shared key (PSK) binding to enable session resumption};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{C}{(Connections terminated. That triggers session resumption with 0-RTT)}{S}{red,<->,dashed}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+\postlevel
+\postlevel
+
+\mess[0]{C}{\shortstack[l]{ClientHello: ...\\KeyShare: ...\\PskKeyExchangeModes: 'psk_dhe_ke'\\EarlyDataIndication\\PreSharedKey: \{session key ID, HMAC($K_{\textop{finished}}$, transcript)\}\\\{Application Data\}$_{K_{{\textop{early}}}}$}}{S}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{$S_{\textop{early }}\gets{\textop{ Extract}}(0, S_{\textop{resumption}})$\\${\textop{Binder}}{\textop{ key}}: K_{{\textop{binder}}} \gets{\textop{ Derive}}(S_{\textop{early}},{\textop{ \textnormal{\textquotesingle}res\ binder\textnormal{\textquotesingle}}}, \emptyset)$\\${\textop{Early}}{\textop{ Traffic }}{\textop{Key}}: K_{{\textop{early}}} \gets{\textop{ Derive}}(S_{\textop{early}},{\textop{ \textnormal{\textquotesingle}c\ e\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$\\${\textop{Finished}}{\textop{ key}}: K_{\textop{finished }}\gets{\textop{ Derive}}(K_{{\textop{binder}}},{\textop{ \textnormal{\textquotesingle}finished\textnormal{\textquotesingle}}},{\textop{ transcript}})$}};
+\node [anchor=west] at (mess to) {};
+\postlevel
+
+\mess[0]{S}{\shortstack[l]{ServerHello: ...\\KeyShare: ...\\PreSharedKey: \{session key ID\}\\EncryptedExtensions: \{EarlyDataIndication\}$_{K_{{\textop{handshake}}_{\textop{b}}}}$}}{C}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{$S_{\textop{handshake }}\gets{\textop{ Extract}}({\textop{Derive}}(S_{\textop{early}},{\textop{ \textnormal{\textquotesingle}derived\textnormal{\textquotesingle}}}, \emptyset), x)$\\${\textop{Handshake}}{\textop{ traffic }}{\textop{key}}: K_{{\textop{handshake}}_{\textop{b}}} \gets{\textop{ Derive}}(S_{\textop{handshake}},{\textop{ \textnormal{\textquotesingle}s\ hs\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$}};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{S}{}{S}{white,->}
+\node [anchor=west] at (mess from) {$S_{\textop{master }}\gets{\textop{ Extract}}({\textop{Derive}}(S_{\textop{handshake}},{\textop{\textnormal{\textquotesingle}derived\textnormal{\textquotesingle}}}, \emptyset), 0)$};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{S}{$\{{\textop{Finished}}:{\textop{ HMAC}}(K_{\textop{finished}},{\textop{ transcript}})\}_{K_{{\textop{handshake}}_{\textop{b}}}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {${\textop{Finished}}{\textop{ key}}: K_{\textop{finished }}\gets{\textop{ Derive}}(K_{{\textop{handshake}}_{\textop{b}}},{\textop{ \textnormal{\textquotesingle}finished\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{S}{$\{{\textop{Application}}{\textop{ Data}}\}_{K_{{\textop{b}}_0}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {${\textop{Application}}{\textop{ traffic }}{\textop{key}}: K_{{\textop{b}}_0} \gets{\textop{ Derive}}(S_{\textop{master}},{\textop{ \textnormal{\textquotesingle}s\ ap\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{C}{$\{{\textop{EndOfEarlyData}}\}_{K_{{\textop{early}}}}$}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{C}{$\{{\textop{Finished}}:{\textop{ HMAC}}(K_{\textop{finished}},{\textop{ transcript}})\}_{K_{{\textop{handshake}}_{\textop{a}}}}$}{S}{black,->}
+\node [anchor=east] at (mess from) {${\textop{Finished}}{\textop{ key}}: K_{\textop{finished }}\gets{\textop{ Derive}}(K_{{\textop{handshake}}_{\textop{a}}},{\textop{ \textnormal{\textquotesingle}finished\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{S}{$\{{\textop{Application}}{\textop{ Data}}\}_{K_{{\textop{b}}_0}}$}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{C}{$\{{\textop{Application}}{\textop{ Data}}\}_{K_{{\textop{a}}_0}}$}{S}{black,->}
+\node [anchor=east] at (mess from) {${\textop{Application}}{\textop{ traffic }}{\textop{key}}: K_{{\textop{a}}_0} \gets{\textop{ Derive}}(S_{\textop{master}},{\textop{ \textnormal{\textquotesingle}c\ ap\ traffic\textnormal{\textquotesingle}}},{\textop{ transcript}})$};
+\node [anchor=west] at (mess to) {};
+
+%
+% notes
+%
+\node [anchor=north west] (rect) at ([yshift=-20] current bounding box.south west) [draw,thick] {\shortstack[l]{Disclaimer: this diagram is a rough sketch of the TLS 1.3 handshake and record protocol. It serves as a quickstarter to understand the protocol flows. It may contain inaccurate or oversimplified representations.\\1) TLS Settings\\Cipher Suite: TLS_AES_128_GCM_SHA256\\Digital Signature: ecdsa_secp256r1_sha256\\Key Exchange: secp256r1 (NIST P-256) with $(G, n)$ as part of domain parameters, with public and private key in the form of $(Q, d)$\\Pre-Shared Key Cipher: TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384\\2) Protocol Notations\\Key Extraction Function: Extract(salt, keying material)\\Key Derive Function: Derive(secret, label, transcript), where transcript is the concatenation of each included handshake message.\\Encryption: \{plaintext\}$_{{\textop{key}}}$, which denotes an AEAD-Encrypt operation with write key and IV generated from key.}};
+
+\end{sequencediagram}
+\end{document}

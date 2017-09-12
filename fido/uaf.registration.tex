@@ -1,0 +1,149 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+}
+
+%% make text appear as op in math mode
+\newcommand{\textop}[1]{\relax\ifmmode\mathop{\text{#1}}\else\text{#1}\fi}
+\newcommand{\stextop}[1]{\relax\ifmmode\mathop{\text{ #1 }}\else\text{#1}\fi}
+
+\begin{document}
+\sffamily
+\small
+
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
+
+%
+% actors
+%
+\newinst[0]{U}{User}
+\newinst[6]{A}{Authenticator}
+\newinst[6]{ASM}{Authenticator Specific Modules}
+\newinst[6]{C}{FIDO Client}
+\newinst[6]{B}{User Agent}
+\newinst[6]{W}{Web Server}
+\newinst[6]{S}{FIDO Server}
+
+%
+% sequences
+%
+
+\mess[0]{U}{User clicks on https://webapp}{B}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{B}{HTTP GET https://webapp}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{W}{HTTP 200 OK (login form returns)}{B}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{B}{Render the login form}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{U}{\shortstack[l]{User enters $u$ = USERNAME, ${\textop{pwd}}$ = PASMSWORD\\and submits}}{B}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{B}{HTTP POST {$u$, ${\textop{pwd}}$}}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {Verify $u$, ${\textop{pwd}}$};
+
+\mess[0]{W}{Start UAF Registration}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {Generate Auth Policy ($p$)};
+
+\mess[0]{S}{\shortstack[l]{Send UAF Registration Request =\\($a$ = APP_ID, $c$ = CHALLENGE, $u$, $p$)}}{W}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{W}{HTTP 200 OK ($a$, $u$, $c$, $p$)}{B}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{B}{\shortstack[l]{$a, u, c, p$\\$$}}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {1. Obtain the TLS_DATA};
+
+\mess[0]{C}{Get FACET_ID by $a$}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{W}{Return list of FACET_ID(s)}{C}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{C}{$a, u, fc ={\textop{ hash}}({\textop{fcp}})$}{ASM}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{1. Select authenticator(s) according to $p$\\2. ${\textop{fcp}}$ = ($a$, $c$, FACET_ID, TLS_DATA)}};
+\node [anchor=east] at (mess to) {\shortstack[l]{1. Generate the access token\\$ak$ = hash($a$, NONCE, PERSONA_ID, CALLER_ID)\\CALLER_ID is the platform ID assigned to the FIDO Client\\PERSONA_ID is the user ID on the platform}};
+\postlevel
+
+\mess[0]{ASM}{\shortstack[l]{Send Register Command\\($a$, $u$, $ak$, $fc$)}}{A}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{A}{Trigger local user verification}{U}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+\postlevel
+
+\mess[0]{U}{User interacts with Authenticator(s)}{A}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {\shortstack[l]{1. Generate UAuth Key Pair = (${\textop{Auth}}.{\textop{pub}}$, ${\textop{Auth}}.{\textop{priv}}$) for this handle $h$ = ($a$, $u$) by $ak$\\2. Generate the Key Registration Data = ${\textop{KRD}}$ = (${\textop{AAID}}$, $h$, ${\textop{Auth}}.{\textop{pub}}$, $fc$, ${\textop{Att}}.{\textop{cert}}$, ${\textop{reg}}-{\textop{cntr}}$, ${\textop{cntr}}$, ${\textop{sig}}$ = signature_by_${\textop{Att}}.{\textop{priv}}$(${\textop{AAID}}$, ${\textop{Auth}}.{\textop{pub}}$, $fc$, ${\textop{Att}}.{\textop{pub}}$, ${\textop{reg}}-{\textop{cntr}}$, ${\textop{cntr}}$))\\${\textop{AAID}}$ = Authenticator Attestation ID\\${\textop{Att}}.{\textop{cert}}$ = Authenticator Certificate\\${\textop{Att}}.{\textop{pub}}$, ${\textop{Att}}.{\textop{priv}}$ = Authenticator Key Pair\\${\textop{reg}}-{\textop{cntr}}$ = Registration Counter\\${\textop{cntr}}$ = Signature Counter}};
+\postlevel
+
+\mess[0]{A}{${\textop{KRD}}$}{ASM}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{ASM}{\shortstack[l]{${\textop{KRD}}$\\$$}}{C}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{C}{\shortstack[l]{${\textop{KRD}}$\\$$}}{B}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{B}{\shortstack[l]{${\textop{KRD}}$\\$$}}{W}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{W}{${\textop{KRD}}$}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {\shortstack[l]{1. Verify the ${\textop{KRD}}$ signature by ${\textop{Att}}.{\textop{pub}}$\\2. Store ${\textop{Auth}}.{\textop{pub}}$ for this $h$}};
+
+\mess[0]{S}{Return verification result}{W}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{W}{HTTP 200 OK (verification result)}{B}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\end{sequencediagram}
+\end{document}

@@ -1,0 +1,118 @@
+
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage[underline=false,roundedcorners=true]{pgf-umlsd}
+\usepackage{underscore}
+\usepackage{syntax}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usetikzlibrary{shadows,positioning}
+\tikzset{every shadow/.style={fill=none,shadow xshift=0pt,shadow yshift=0pt}}
+
+%% Redefine mess for node with non-trival label, add support arrow shape
+\renewcommand{\mess}[5][0]{
+  \stepcounter{seqlevel}
+  \path
+  (#2)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess from) {};
+  \addtocounter{seqlevel}{#1}
+  \path
+  (#4)+(0,-\theseqlevel*\unitfactor-0.7*\unitfactor) node (mess to) {};
+  \draw[#5,>=angle 60] (mess from) -- (mess to) node[midway, above]
+  {#3};
+}
+
+%% make text appear as op in math mode
+\newcommand{\textop}[1]{\relax\ifmmode\mathop{\text{#1}}\else\text{#1}\fi}
+\newcommand{\stextop}[1]{\relax\ifmmode\mathop{\text{ #1 }}\else\text{#1}\fi}
+
+\begin{document}
+\sffamily
+\small
+
+\begin{sequencediagram}
+\tikzstyle{inststyle}+=[drop shadow={opacity=0.9,fill=lightgray}]
+\def\unitfactor{1.2}
+
+%
+% actors
+%
+\newinst[0]{I}{initiator: $a$}
+\newinst[6]{S}{server}
+\newinst[6]{R}{recipient: $b$}
+
+%
+% sequences
+%
+
+\mess[0]{I}{$Q_{{\textop{I}}_a}, Q_{{\textop{S}}_a}, Q_{{\textop{O}}_a},{\textop{ Sign}}_{d_{{\textop{I}}_a}}(Q_{{\textop{S}}_a})$}{S}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{${\textop{Identity}}{\textop{ Key}}:{\textop{ I}}_a = (d_{{\textop{I}}_a}, Q_{{\textop{I}}_a})  \gets{\textop{ Curve}}25519()$\\${\textop{Signed}}{\textop{ Pre }}{\textop{Key}}:{\textop{ S}}_a = (d_{{\textop{S}}_a}, Q_{{\textop{S}}_a}) \gets{\textop{ Curve}}25519()$\\${\textop{One-Time}}{\textop{ Pre }}{\textop{Key}}:{\textop{ O}}_a = (d_{{\textop{O}}_a}, Q_{{\textop{O}}_a})\gets{\textop{ Curve}}25519()$}};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{R}{$Q_{{\textop{I}}_b}, Q_{{\textop{S}}_b}, Q_{{\textop{O}}_b},{\textop{ Sign}}_{d_{{\textop{I}}_b}}(Q_{{\textop{S}}_b})$}{S}{black,->}
+\node [anchor=west] at (mess from) {\shortstack[l]{${\textop{Identity}}{\textop{ Key}}:{\textop{ I}}_b = (d_{{\textop{I}}_b}, Q_{{\textop{I}}_b})  \gets{\textop{ Curve}}25519()$\\${\textop{Signed}}{\textop{ Pre }}{\textop{Key}}:{\textop{ S}}_b = (d_{{\textop{S}}_b}, Q_{{\textop{S}}_b}) \gets{\textop{ Curve}}25519()$\\${\textop{One-Time}}{\textop{ Pre }}{\textop{Key}}:{\textop{ O}}_b = (d_{{\textop{O}}_b}, Q_{{\textop{O}}_b})\gets{\textop{ Curve}}25519()$}};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{I}{get recipient public keys}{S}{black,->}
+\node [anchor=east] at (mess from) {};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{S}{$Q_{{\textop{I}}_b}, Q_{{\textop{S}}_b}, Q_{{\textop{O}}_b}$}{I}{black,->}
+\node [anchor=west] at (mess from) {};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{I}{$Q_{{\textop{I}}_a}, Q_{{\textop{E}}_a}$}{R}{black,->}
+\node [anchor=east] at (mess from) {${\textop{Ephemeral}}{\textop{ Key}}:{\textop{ E}}_a = (d_{{\textop{E}}_a}, Q_{{\textop{E}}_a})\gets{\textop{ Curve}}25519()$};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{I}{${\textop{ECDH}}({\textop{I}}_a,{\textop{ S}}_b)$}{R}{black,<->}
+\node [anchor=east] at (mess from) {${\textop{Exchange }}K_1$};
+\node [anchor=west] at (mess to) {${\textop{Exchange }}K_1$};
+
+\mess[0]{I}{${\textop{ECDH}}({\textop{E}}_a,{\textop{ I}}_b)$}{R}{black,<->}
+\node [anchor=east] at (mess from) {${\textop{Exchange }}K_2$};
+\node [anchor=west] at (mess to) {${\textop{Exchange }}K_2$};
+
+\mess[0]{I}{${\textop{ECDH}}({\textop{E}}_a,{\textop{ S}}_b)$}{R}{black,<->}
+\node [anchor=east] at (mess from) {${\textop{Exchange }}K_3$};
+\node [anchor=west] at (mess to) {${\textop{Exchange }}K_3$};
+
+\mess[0]{I}{${\textop{ECDH}}({\textop{E}}_a,{\textop{ O}}_b)$}{R}{black,<->}
+\node [anchor=east] at (mess from) {${\textop{Exchange }}K_4$};
+\node [anchor=west] at (mess to) {${\textop{Exchange }}K_4$};
+
+\mess[0]{I}{}{I}{white,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{$K_{\textop{master }}\gets K_1 \Vert  K_2 \Vert  K_3 \Vert  K_4$\\$K_{\textop{root}}, K_{\textop{chain }}={\textop{ HKDF}}(K_{\textop{master}})$}};
+\node [anchor=west] at (mess to) {};
+\postlevel
+
+\mess[0]{I}{${\textop{cipher}},{\textop{ signature}}, Q_{{\textop{E}}_a}$}{R}{black,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{${\textop{Ephemeral}}{\textop{ Key}}:{\textop{ E}}_a = (d_{{\textop{E}}_a}, Q_{{\textop{E}}_a})\gets{\textop{ Curve}}25519()$\\$K_{\textop{message }}={\textop{ HMAC}}_{K_{\textop{chain}}}(1)$\\$K_{\textop{chain }}={\textop{ HMAC}}_{K_{\textop{chain}}}(2)$\\${\textop{cipher }}={\textop{ Encrypt}}_{K_{\textop{message}}}({\textop{message}})$\\${\textop{signature }}={\textop{ HMAC}}_{K_{\textop{message}}}({\textop{cipher}})$}};
+\node [anchor=west] at (mess to) {\shortstack[l]{$K_{\textop{master }}\gets K_1 \Vert  K_2 \Vert  K_3 \Vert  K_4$\\$K_{\textop{root}}, K_{\textop{chain }}={\textop{ HKDF}}(K_{\textop{master}})$\\$K_{\textop{message }}={\textop{ HMAC}}_{K_{\textop{chain}}}(1)$\\$K_{\textop{chain }}={\textop{ HMAC}}_{K_{\textop{chain}}}(2)$\\${\textop{message }}={\textop{ Decrypt}}_{K_{\textop{message}}}({\textop{cipher}})$}};
+\postlevel
+
+\mess[0]{I}{}{I}{white,->}
+\node [anchor=east] at (mess from) {Keep sending new messages until recipient responds.};
+\node [anchor=west] at (mess to) {};
+
+\mess[0]{R}{$Q_{{\textop{E}}_b}$}{I}{black,->}
+\node [anchor=west] at (mess from) {${\textop{Ephemeral}}{\textop{ Key}}:{\textop{ E}}_b = (d_{{\textop{E}}_b}, Q_{{\textop{E}}_b})\gets{\textop{ Curve}}25519()$};
+\node [anchor=east] at (mess to) {};
+
+\mess[0]{I}{${\textop{ECDH}}({\textop{E}}_a,{\textop{ E}}_b)$}{R}{black,<->}
+\node [anchor=east] at (mess from) {\shortstack[l]{${\textop{Exchange }}K_{\textop{ephemeral}}$\\$K_{\textop{chain}}, K_{\textop{root }}={\textop{ HKDF}}(K_{\textop{root}}, K_{\textop{ephemeral}})$}};
+\node [anchor=west] at (mess to) {\shortstack[l]{${\textop{Exchange }}K_{\textop{ephemeral}}$\\$K_{\textop{chain}}, K_{\textop{root }}={\textop{ HKDF}}(K_{\textop{root}}, K_{\textop{ephemeral}})$}};
+\postlevel
+
+\mess[0]{I}{}{I}{white,->}
+\node [anchor=east] at (mess from) {\shortstack[l]{As $K_{\textop{chain}}$ and $K_{\textop{root}}$ are rolled,\\the rest of the protocol follows from above.}};
+\node [anchor=west] at (mess to) {};
+
+%
+% notes
+%
+\node [anchor=north west] (rect) at ([yshift=-20] current bounding box.south west) [draw,thick] {\shortstack[l]{$$\\Notation: $(d, Q) \gets{\textop{ Curve25519()}}$ is the key\\generation function that generates $d$ as\\private key and $Q$ as public key.}};
+
+\end{sequencediagram}
+\end{document}
